@@ -1,0 +1,28 @@
+{
+  "name": "mts-design-cards",
+  "version": "1.0.0",
+  "description": "Telegram WebApp для метафорических предсказаний на MTS Design Weekend",
+  "main": "bot-example.js",
+  "scripts": {
+    "start": "node bot-example.js",
+    "dev": "nodemon bot-example.js"
+  },
+  "keywords": [
+    "telegram",
+    "webapp",
+    "bot",
+    "cards",
+    "prediction",
+    "metaphor",
+    "design"
+  ],
+  "author": "MTS Design Weekend",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "telegraf": "^4.15.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+} 

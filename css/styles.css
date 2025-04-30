@@ -1,0 +1,276 @@
+:root {
+    --primary-color: #2374E1;
+    --secondary-color: #F8F9FA;
+    --accent-color: #E91E63;
+    --text-color: #333333;
+    --light-gray: #E5E5E5;
+    --dark-gray: #757575;
+    --white: #FFFFFF;
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--secondary-color);
+}
+
+.container {
+    max-width: 100%;
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+h1 {
+    color: var(--primary-color);
+    margin-bottom: 5px;
+    font-size: 28px;
+}
+
+.subtitle {
+    color: var(--dark-gray);
+    font-size: 16px;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.screen {
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+    background-color: var(--white);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
+.screen.active {
+    display: block;
+}
+
+.instruction {
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--light-gray);
+    border-radius: 5px;
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+}
+
+input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px dashed var(--primary-color);
+    border-radius: 5px;
+    background-color: var(--secondary-color);
+}
+
+button {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: 20px;
+}
+
+.primary-button {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.primary-button:hover {
+    background-color: rgba(35, 116, 225, 0.9);
+}
+
+.secondary-button {
+    background-color: var(--light-gray);
+    color: var(--text-color);
+}
+
+.secondary-button:hover {
+    background-color: #D5D5D5;
+}
+
+#loading-screen {
+    text-align: center;
+}
+
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--light-gray);
+    border-top: 5px solid var(--primary-color);
+    border-radius: 50%;
+    margin: 30px auto;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.prediction {
+    padding: 20px;
+    background-color: var(--secondary-color);
+    border-radius: 5px;
+    margin: 20px 0;
+    line-height: 1.8;
+    white-space: pre-line;
+}
+
+footer {
+    text-align: center;
+    margin-top: 30px;
+    color: var(--dark-gray);
+    font-size: 14px;
+}
+
+/* Стили для экрана результатов */
+.card-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.card-image-container {
+    width: 150px;
+    height: 150px;
+    overflow: hidden;
+    border-radius: 50%;
+    margin-bottom: 15px;
+    border: 3px solid var(--primary-color);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-title {
+    font-weight: 500;
+    color: var(--primary-color);
+    font-size: 18px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.prediction {
+    padding: 20px;
+    background-color: var(--secondary-color);
+    border-radius: 5px;
+    margin: 20px 0;
+    line-height: 1.8;
+    white-space: pre-line;
+    font-size: 16px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.action-buttons button {
+    flex: 1;
+    margin-top: 0;
+}
+
+/* Стили для предпросмотра изображения */
+.image-preview-container {
+    position: relative;
+    margin-top: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+    max-width: 100%;
+}
+
+.image-preview {
+    display: block;
+    max-width: 100%;
+    max-height: 200px;
+    margin: 0 auto;
+    border-radius: 5px;
+}
+
+.remove-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+}
+
+/* Telegram WebApp Integration */
+body.telegram-app {
+    background-color: var(--tg-theme-bg-color, var(--secondary-color));
+    color: var(--tg-theme-text-color, var(--text-color));
+}
+
+.telegram-app .primary-button {
+    background-color: var(--tg-theme-button-color, var(--primary-color));
+    color: var(--tg-theme-button-text-color, var(--white));
+}
+
+.telegram-app h1 {
+    color: var(--tg-theme-text-color, var(--primary-color));
+}
+
+.telegram-app .screen {
+    background-color: var(--tg-theme-secondary-bg-color, var(--white));
+} 

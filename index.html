@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTS Design Weekend - Карты предсказаний</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Карты предсказаний</h1>
+            <p class="subtitle">MTS Design Weekend</p>
+        </header>
+
+        <main>
+            <div id="start-screen" class="screen active">
+                <p class="instruction">Загадайте вопрос (личный, рабочий, философский — всё, что вас волнует в контексте дизайна).</p>
+                <p class="instruction">Сфотографируйте выбранную карту и загрузите её.</p>
+                
+                <div class="input-group">
+                    <label for="question">Ваш вопрос:</label>
+                    <textarea id="question" placeholder="Введите ваш вопрос здесь..."></textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label for="card-upload">Фотография карты:</label>
+                    <input type="file" id="card-upload" accept="image/*" capture="environment">
+                    <div id="image-preview-container" class="image-preview-container" style="display: none;">
+                        <img id="image-preview" class="image-preview" alt="Предпросмотр карты">
+                        <button type="button" id="remove-image" class="remove-button">&times;</button>
+                    </div>
+                </div>
+                
+                <button id="submit-button" class="primary-button">Получить предсказание</button>
+            </div>
+            
+            <div id="loading-screen" class="screen">
+                <div class="loader"></div>
+                <p>Анализируем карту и готовим предсказание...</p>
+            </div>
+            
+            <div id="result-screen" class="screen">
+                <h2>Ваше предсказание</h2>
+                <div class="card-info">
+                    <div class="card-image-container">
+                        <img id="result-card-image" alt="Ваша карта" class="card-image">
+                    </div>
+                    <div id="card-title" class="card-title"></div>
+                </div>
+                <div id="prediction-text" class="prediction"></div>
+                <div class="action-buttons">
+                    <button id="share-button" class="primary-button">Поделиться</button>
+                    <button id="reset-button" class="secondary-button">Новое предсказание</button>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2025 MTS Design Weekend</p>
+        </footer>
+    </div>
+    
+    <script src="js/app.js"></script>
+</body>
+</html> 
