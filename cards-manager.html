@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление картами | MTS Design Weekend</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <style>
+        /* Дополнительные стили для страницы управления картами */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .card-item {
+            background-color: var(--glassmorphism);
+            border-radius: var(--card-radius);
+            padding: 25px;
+            border: var(--glassmorphism-border);
+            box-shadow: var(--glassmorphism-shadow);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .card-item:hover {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            transform: translateY(-3px);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .card-id {
+            font-size: 12px;
+            color: var(--dark-gray);
+            margin-bottom: 5px;
+        }
+        
+        .card-title {
+            font-size: 20px;
+            margin: 0 0 10px 0;
+            color: var(--white);
+            font-weight: 700;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--dark-gray);
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .action-btn:hover {
+            color: var(--white);
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+        
+        .edit-btn:hover {
+            color: #2196F3;
+        }
+        
+        .delete-btn:hover {
+            color: #F44336;
+        }
+        
+        .card-description {
+            margin-bottom: 20px;
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+        
+        .qr-container {
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .download-qr {
+            display: block;
+            margin: 10px auto 0;
+            padding: 8px 15px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .download-qr:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .back-link {
+            color: var(--white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
+        
+        .back-link:hover {
+            color: var(--primary-color);
+        }
+        
+        .back-link i {
+            margin-right: 8px;
+        }
+        
+        .card-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .card-modal.active {
+            opacity: 1;
+        }
+        
+        .modal-content {
+            background-color: var(--glassmorphism);
+            border-radius: 20px;
+            padding: 12px;
+            max-width: 450px;
+            width: 95%;
+            border: var(--glassmorphism-border);
+            box-shadow: var(--glassmorphism-shadow);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            animation: fadeIn 0.4s ease-out forwards;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal-content.active {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            font-size: 22px;
+            color: var(--white);
+        }
+        
+        .form-group {
+            margin-bottom: 10px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--white);
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: var(--white);
+            font-size: 15px;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: var(--dark-gray);
+            font-size: 11px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .image-upload-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .image-preview {
+            width: 100%;
+            height: 100px;
+            border-radius: 10px;
+            border: 1px dashed rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        .image-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .no-image {
+            color: var(--dark-gray);
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .image-upload-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--dark-gray);
+            font-size: 18px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .close-modal:hover {
+            color: var(--primary-color);
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .top-bar-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn-secondary {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .card-image-container {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .btn-danger {
+            background-color: rgba(244, 67, 54, 0.2);
+            color: #F44336;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+        
+        .btn-danger:hover {
+            background-color: rgba(244, 67, 54, 0.3);
+        }
+        
+        /* Обновлённые стили для отображения ID и названия карты */
+        .card-header-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        
+        .card-id-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .card-id {
+            font-size: 12px;
+            color: var(--dark-gray);
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+        
+        /* Удаляем стили для сортировки внутри модального окна */
+        .drop-highlight {
+            border: 2px solid rgba(255, 255, 255, 0.5) !important;
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        /* Добавляем стили для полноразмерного просмотра карты */
+        .fullsize-card-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1100;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .fullsize-card-modal.active {
+            opacity: 1;
+        }
+        
+        .fullsize-card-container {
+            position: relative;
+            max-width: 80%;
+            max-height: 80%;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        
+        .fullsize-card-image {
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: var(--normal-shadow);
+        }
+        
+        .close-fullsize-card {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .close-fullsize-card:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+            transform: scale(1.1);
+        }
+        
+        .card-id-display {
+            padding: 12px;
+            background-color: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--dark-gray);
+            font-family: monospace;
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-bar">
+            <a href="admin.html" class="back-link"><i class="fas fa-arrow-left"></i> Вернуться в админ-панель</a>
+            <div class="top-bar-actions">
+                <button id="import-cards-btn" class="btn btn-secondary"><i class="fas fa-upload"></i> Импорт карт</button>
+                <button id="export-cards-btn" class="btn btn-secondary"><i class="fas fa-download"></i> Экспорт карт</button>
+                <button id="add-card-btn" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Добавить карту</button>
+            </div>
+        </div>
+        
+        <header>
+            <h1>Управление картами</h1>
+            <p class="subtitle">MTS Design Weekend - Карты предсказаний</p>
+        </header>
+        
+        <main>
+            <div class="card-grid" id="card-grid">
+                <!-- Карточки будут добавлены с помощью JavaScript -->
+            </div>
+        </main>
+    </div>
+    
+    <!-- Модальное окно для добавления/редактирования карты -->
+    <div id="card-modal" class="card-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Управление картой</h2>
+                <button class="close-modal action-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="card-form" onsubmit="return false;">
+                <div class="form-group">
+                    <label>ID карты:</label>
+                    <div class="card-id-display">
+                        <span id="card-id-display"></span>
+                </div>
+                    <small>Идентификатор карты генерируется автоматически.</small>
+                    <!-- Скрытое поле для хранения ID -->
+                    <input type="hidden" id="card-id">
+                </div>
+                <div class="form-group">
+                    <label for="card-title">Название карты:</label>
+                    <input type="text" id="card-title" placeholder="Введите название карты" required>
+                </div>
+                <div class="form-group">
+                    <label for="card-description">Описание карты:</label>
+                    <textarea id="card-description" placeholder="Введите описание предсказания для этой карты" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="card-image">Изображение карты:</label>
+                    <div class="image-upload-container">
+                        <div class="image-preview" id="image-preview">
+                            <img id="preview-img" src="" alt="Превью изображения" style="display: none;">
+                            <div id="no-image-placeholder" class="no-image">Нет изображения</div>
+                        </div>
+                        <div class="image-upload-controls">
+                            <input type="file" id="card-image" accept="image/*" style="display: none;">
+                            <button type="button" id="upload-image-btn" class="btn btn-secondary">Загрузить изображение</button>
+                            <button type="button" id="remove-image-btn" class="btn btn-danger" style="display: none;">Удалить изображение</button>
+                        </div>
+                    </div>
+                    <small>Рекомендуемый размер изображения: 600×800 пикселей.</small>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn close-btn btn-secondary">Отмена</button>
+                    <button type="button" id="save-card-btn" class="btn btn-primary">Сохранить карту</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Шаблон карточки -->
+    <template id="card-template">
+        <div class="card-item">
+            <div class="card-header">
+                <div class="card-header-info">
+                    <div class="card-id-title">
+                        <div class="card-id">ID: <span data-card-id></span> - <span data-card-title-small></span></div>
+                    </div>
+                    <h3 class="card-title" data-card-title></h3>
+                </div>
+                <div class="card-actions">
+                    <button class="action-btn edit-btn" data-action="edit"><i class="fas fa-edit"></i></button>
+                    <button class="action-btn delete-btn" data-action="delete"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            </div>
+            <div class="card-image-container">
+                <img class="card-image" data-card-image src="" alt="Изображение карты">
+            </div>
+            <p class="card-description" data-card-description></p>
+            <div class="qr-container">
+                <div class="qr-code" data-qr-container style="display: none;"></div>
+                <button class="download-qr" data-action="download-qr">Скачать QR-код</button>
+            </div>
+        </div>
+    </template>
+    
+    <!-- Добавляем модальное окно для полноразмерного просмотра карты -->
+    <div id="fullsize-card-modal" class="fullsize-card-modal">
+        <div class="fullsize-card-container">
+            <img id="fullsize-card-image" class="fullsize-card-image" src="" alt="Карта в полном размере">
+            <button class="close-fullsize-card"><i class="fas fa-times"></i></button>
+        </div>
+    </div>
+    
+    <!-- Добавляем скрытый input для загрузки файла импорта -->
+    <input type="file" id="import-file-input" accept=".json" style="display: none;">
+    
+    <script>
+        // Карты и их метафоры/описания
+        let cards = {
+            'card001': {
+                title: 'ДОСТИЖЕНИЕ',
+                description: 'Каждый день ты становишься сильнее. Комментарий за комментарием. Правка за правкой. Но где-то очень в глубине души.'
+            },
+            'card002': {
+                title: 'ТЕНДЕР',
+                description: 'Ты создашь что-то очень большое и о тебе заговорит вся индустрия, надеемся, что хорошее тоже скажут.'
+            },
+            'card003': {
+                title: 'ТВОРЕЦ',
+                description: 'Твой мозг полон идей, твоё тело полно сил, твоё сердце открыто всему новому. Самое время наделать дел.'
+            },
+            'card004': {
+                title: 'ВОЛШЕБНИК',
+                description: 'Скрытые проблемы могут помешать реализации твоего следующего проекта. Пренебрегай и продолжай вальсировать.'
+            },
+            'card005': {
+                title: 'ВЫБОР',
+                description: 'Если ты будешь много и усердно работать, то, скорее всего, ты просто будешь много и усердно работать.'
+            },
+            'card006': {
+                title: 'ВЕЛИЧИЕ',
+                description: 'Твои работы станут революцией в дизайне. Всё, кепку можешь снимать и с броневичка слезать.'
+            },
+            'card007': {
+                title: 'ПАРТНЕР',
+                description: 'От твоих работ безоговорочно у всех захватывает дух. Главное, не испусти этот дух в процессе работы. Попроси помощи.'
+            },
+            'card008': {
+                title: 'ПЛАГИАТ',
+                description: 'Твою следующую работу Тема Лебедев будет выдавать за свою, а может даже возьмёт тебя на работу.'
+            },
+            'card009': {
+                title: 'ПРЕМИЯ',
+                description: 'Ты изобретешь правкоотпугиватель и получишь за него Нобелевскую премию. Но возможно всё-таки Дарвиновскую.'
+            },
+            'card010': {
+                title: 'ИЗВЕСТНОСТЬ',
+                description: 'Твоя следующая работа произведет фурор в индустрии и станет вирусной. Главное, чтобы не мемной.'
+            },
+            'card011': {
+                title: 'УЕДИНЕНИЕ/ИНТРОВЕРТ',
+                description: 'Работы меньше не станет, но ты держись, возможно тебя переведут на удаленку за твою любовь к сырному попкорну.'
+            },
+            'card012': {
+                title: 'АРТ-ДИРЕКТОР',
+                description: 'Совсем скоро ты создашь свою лучшую работу. А потом придут комментарии и ты сделаешь ещё лучше, чем было. И так до бесконечности.'
+            },
+            'card013': {
+                title: 'НАЧАЛО',
+                description: 'Ты стоишь у подножия нового сложного проекта. Не бойся, у тебя всё обязательно получится. Это же не Эверест.'
+            },
+            'card014': {
+                title: 'ТОП-МЕНЕДЖМЕНТ',
+                description: 'Не бойся удивлять, разрушать устоявшиеся шаблоны и создавать что-то принципиально новое. Санитары уже выехали.'
+            },
+            'card015': {
+                title: 'РЕШИМОСТЬ',
+                description: 'Все твои новые идеи будут настолько смелые, что Чак Норрис побоится давать к ним комментарии.'
+            },
+            'card016': {
+                title: 'ДУБЛЬ',
+                description: 'Повторение - мать учения и отец безумия.'
+            },
+            'card017': {
+                title: 'ПОВЫШЕНИЕ/ВОЗВЫШЕНИЕ',
+                description: 'Время для глубокого погружения в новый проект. Чем глубже, тем лучше, ведь только оттолкнувшись от дна можно подняться.'
+            },
+            'card018': {
+                title: 'ДВИЖЕНИЕ',
+                description: 'Стремись к гармонии, балансу и осознанности, ведь они – основа твоего успеха. Однако валерьянку далеко не убирай.'
+            },
+            'card019': {
+                title: 'ФОРТУНА',
+                description: 'Самое время выйти на новый круг. Работа работой, а ретроградный Меркурий никто не отменял. Поехали!'
+            },
+            'card020': {
+                title: 'ПУТЬ',
+                description: 'Не позволяй другим влезать и критиковать твои гениальные работы. Ты прекрасно можешь это сделать сам.'
+            },
+            'card021': {
+                title: 'КРЕАТИВ',
+                description: 'Твои идеи выйдут на следующий уровень и обретут новое сияние. Главное, чтобы не как в том самом фильме с Джеком Николсоном.'
+            },
+            'card022': {
+                title: 'ПРЕВОСХОДСТВО',
+                description: 'Твои работы настолько прекрасны, что душнилам нечего сказать, и они просто молча завидуют. Продолжай.'
+            },
+            'card023': {
+                title: 'ПРАВКИ',
+                description: 'Твой макет без правок может принять только твоя любимая бабушка. Так что терпим и вносим комментарии, коллеги.'
+            }
+        };
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCards();
+            setupModalClosers();
+            
+            // Настраиваем обработчик для кнопки сохранения в модальном окне
+            document.getElementById('card-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveCard();
+            });
+            
+            // Кнопка добавления новой карты
+            document.getElementById('add-card-btn').addEventListener('click', function() {
+                showAddCardModal();
+            });
+            
+            // Кнопка экспорта карт
+            document.getElementById('export-cards-btn').addEventListener('click', function() {
+                exportCards();
+            });
+            
+            // Кнопка импорта карт
+            document.getElementById('import-cards-btn').addEventListener('click', function() {
+                document.getElementById('import-file-input').click();
+            });
+            
+            // Обработчик выбора файла для импорта
+            document.getElementById('import-file-input').addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    importCards(e.target.files[0]);
+                }
+            });
+            
+            // Инициализация обработчиков для загрузки изображений
+            const uploadImageBtn = document.getElementById('upload-image-btn');
+            const removeImageBtn = document.getElementById('remove-image-btn');
+            const cardImageInput = document.getElementById('card-image');
+            const previewImg = document.getElementById('preview-img');
+            const noImagePlaceholder = document.getElementById('no-image-placeholder');
+            
+            // Обработчик кнопки загрузки изображения
+            uploadImageBtn.addEventListener('click', function() {
+                cardImageInput.click();
+            });
+            
+            // Обработчик выбора файла
+            cardImageInput.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(event) {
+                        previewImg.src = event.target.result;
+                        previewImg.style.display = 'block';
+                        noImagePlaceholder.style.display = 'none';
+                        removeImageBtn.style.display = 'block';
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Обработчик удаления изображения
+            removeImageBtn.addEventListener('click', function() {
+                previewImg.src = '';
+                previewImg.style.display = 'none';
+                noImagePlaceholder.style.display = 'block';
+                removeImageBtn.style.display = 'none';
+                cardImageInput.value = ''; // Очищаем выбранный файл
+            });
+            
+            // Кнопка сохранения карты
+            document.getElementById('save-card-btn').addEventListener('click', saveCard);
+            
+            // Настройка drag and drop для загрузки изображений
+            setupImageDragAndDrop();
+        });
+        
+        // Функция настройки drag and drop для загрузки изображений
+        function setupImageDragAndDrop() {
+            const imagePreview = document.getElementById('image-preview');
+            const previewImg = document.getElementById('preview-img');
+            const noImagePlaceholder = document.getElementById('no-image-placeholder');
+            const removeImageBtn = document.getElementById('remove-image-btn');
+            
+            // Предотвращаем действия браузера по умолчанию
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                imagePreview.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            // Добавляем визуальную индикацию
+            ['dragenter', 'dragover'].forEach(eventName => {
+                imagePreview.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                imagePreview.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                imagePreview.classList.add('drop-highlight');
+            }
+            
+            function unhighlight() {
+                imagePreview.classList.remove('drop-highlight');
+            }
+            
+            // Обработка брошенных файлов
+            imagePreview.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length > 0) {
+                    const file = files[0];
+                    if (file.type.match('image.*')) {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(event) {
+                            previewImg.src = event.target.result;
+                            previewImg.style.display = 'block';
+                            noImagePlaceholder.style.display = 'none';
+                            removeImageBtn.style.display = 'block';
+                        };
+                        
+                        reader.readAsDataURL(file);
+                    }
+                }
+            }
+            
+            // Добавляем стили для drag-and-drop
+            const style = document.createElement('style');
+            style.textContent = `
+                .drop-highlight {
+                    border: 2px solid rgba(255, 255, 255, 0.5) !important;
+                    background-color: rgba(255, 255, 255, 0.1) !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // Функция отображения карт
+        function renderCards() {
+            const cardGrid = document.getElementById('card-grid');
+            cardGrid.innerHTML = '';
+            
+            // Получаем шаблон карточки
+            const template = document.getElementById('card-template');
+            
+            // Для каждой карты в данных
+            Object.keys(cards).forEach(id => {
+                const card = cards[id];
+                
+                // Клонируем шаблон
+                const cardElement = document.importNode(template.content, true).firstElementChild;
+                
+                // Заполняем данные
+                cardElement.querySelector('[data-card-id]').textContent = id;
+                cardElement.querySelector('[data-card-title]').textContent = card.title;
+                cardElement.querySelector('[data-card-title-small]').textContent = card.title || '';
+                cardElement.querySelector('[data-card-description]').textContent = card.description || '';
+                
+                // Настраиваем изображение карты
+                const cardImage = cardElement.querySelector('[data-card-image]');
+                if (card.imageData) {
+                    cardImage.src = card.imageData;
+                    cardImage.style.display = 'block';
+                } else {
+                    // Проверяем, есть ли файл изображения в папке
+                    cardImage.src = `img/cards/${id}.png`;
+                    cardImage.onerror = function() {
+                        // Если изображение не найдено, используем заполнитель
+                        this.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV9TiyIVBTuIOGSoThZERRy1CkWoEGqFVh1MbvqhNGlIUlwcBdeCgx+LVQcXZ10dXAVB8APEydFJ0UVK/F9SaBHjwXE/3t173L0DhGaNqWZgHFA1y8gkE2K+sCIGXxFAGEMIICAxU5+TZRp4jq97+Ph6F+dZ3uf+HP1K0WSATySeY7phEW8QT29aOud94ggrSQrxOfGEQRckfuS67PIb56LLAs+MmLnMPHGEWCz3sdzFrGKoxFPEUUXVKF/Iu6xw3uKs1uqsfU/+wlBRW85yneYQklhECmmIkFFHFTVYiNOqkWIiQ/sJD/+w40+RSyZXFYwcC6hDheT4wf/gd7dmcWrSTQrGgd4X2/4YAwK7QKth29/Htt06AfzPwJXW9lcbwOwn6c22FjwC+reBi+u2Ju8BlzvA0JMuGZIj+WkKpRLwfkbfVAAGb4G+Nbe31j5OH4AMdbV8AxwcAqNFyl73eHdPZ2//nmn19wOZi3KhS/KCCQAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB+cJFg4dGJ6Db+4AAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAEPUlEQVR42u2bT0hUQRzHv7O7lq5GZYQRFGRBUkSHiCKCwrpk0iWMDnmoU4fALtWpU+cuQocIgjoEdvGQ0MWO/QEj6BRBEUixicvqrju/DuXz9TzlvXlv1t8Hhmffvnlvfp/5zW9mb2cl2YLlGAqyAEzbW1DAQ1/4/T7hLT6QSPio95Y79smwYVuKk6QVmDWx7bS99+uvQUttTctANu1jdMTHTNbHzJRCLgcsr8uYz6uM37aB9ZsU7j+0wZiV+0vAvY86u2xJHO9cRrFLcwpVAYWFeeDoMYWnfTbcVFIDhg9n2bDNiAPdJbS0xXeyQJdTzP3k4MfnzVhesJKDQKbbR9/rlc0+uQZt2wGGhnz09wPz89XRXVQ2Ep6L48dVdRvkDDh5up4Gz+NDmQF5w+jRk+sZn4r52RQ2bVbJ5QBnw356e11cv24hmYzWwWIR6OtzcevWTni+1JdApfp3VrL4RlDVYvj40sSng0mmAlxXYXg4j/PnLVCFAJcm/oiSMDrqYGrKxK1beSdVk+WNTfmYnFTG3YPmZm8tdBXHsXDwoGv86SsYBmJLgaVfnTH1/r9BTRXAWyFY+fOK7CvQ8AXQCPiOMAFcAl0CV+B/yQF8RyiAu0BQBOWdYAJVVAK/1a1AVQQ5oiUXQYmHQXYBJYBrgCYECKvXTwHSYQ5zUFNxpzEhQDKc4U7KUhPDN6mRSAFUeEhyBWgTEE9AwxEgi6MRcQmkJ6TilzCrSTIMiCOaQFUcx+IMcL5RJzDmCwplwIiI5Cbx8YVrAWdADQlglLe1tkpTVdfW1lbU1dWhtbW1oqWlBfX19cjlcvj2bQrT09PwPA9TU1N/OLW7AUMp2jE2liFCAMq1jo6OY31d3R+vXbt2oa2tDZlMBlNTU/jy5Qvm5uaM2AhJQHOzxMhI+UM1YExAMpm0jxXlw67r2qdPn8bExAQ8zzNmJyQBGzZI/Py5tteBIaCtrc0+derUKiOjoYuLi8bnCClCrgskkwILC1UZyPq98UXqgQ7tVQeM9jkYC2wAYxC2bCg0Ozsrtm7dykYrgIiGTp8+3ZTJ7GdjFUJEQxVFTMzPz1tlWWZDFSJOQjQ0k81ms2y0IpS5UQqSoOuagUwmw3YrQt2oExFJkKA3ufQHjE4HpTVMQ1l3OL12vgmKBEpAYE9IiQjsQxR34XJYmoCKCBCc3oULNSOgHAnBHsWgSZeJVrFBcTN4f/ToUdFXV2/Pnj3W5OSkWFhYkFNTU0QklIoF3U2aJICRXoOTTqedvr6+b3v37rUCG/39/dbu3bvpgbFlSyQDQgmQ6JEhO3fu9M6cOTPR2dm5S4dgZ2fnPrvO6OjoKERCJAGJRIKKIBGRiWQyWej+XZGEcvMFlZx0IiKSSBLqU/qvvUb/V2BwcPBRTRAAkjAYSoBSaocxxpIkaQVBIMKKEASBlZbLWNdCzm+oRTL0/Mq9aAAAAABJRU5ErkJggg==';
+                    };
+                }
+                
+                // Добавляем QR-код (скрыт)
+                const qrContainer = cardElement.querySelector('[data-qr-container]');
+                new QRCode(qrContainer, {
+                    text: id,
+                    width: 128,
+                    height: 128,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                
+                // Добавляем обработчик клика по изображению для открытия полноразмерного просмотра
+                const cardImageContainer = cardElement.querySelector('.card-image-container');
+                cardImageContainer.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Предотвращаем всплытие события до карточки
+                    showFullsizeCardImage(cardImage.src, card.title);
+                });
+                
+                // Делаем карточку кликабельной для открытия модального окна редактирования
+                cardElement.addEventListener('click', function(e) {
+                    // Игнорируем клики на кнопки действий и изображение
+                    if (!e.target.closest('.action-btn') && 
+                        !e.target.closest('.download-qr') && 
+                        !e.target.closest('.card-image-container')) {
+                        showEditCardModal(id);
+                    }
+                });
+                
+                // Настраиваем обработчики событий для кнопок
+                const editBtn = cardElement.querySelector('[data-action="edit"]');
+                const deleteBtn = cardElement.querySelector('[data-action="delete"]');
+                const downloadQrBtn = cardElement.querySelector('[data-action="download-qr"]');
+                
+                editBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Предотвращаем всплытие клика до обработчика карточки
+                    showEditCardModal(id);
+                });
+                
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Предотвращаем всплытие клика до обработчика карточки
+                    deleteCard(id);
+                });
+                
+                // Используем отдельную функцию для обработки скачивания QR-кода
+                downloadQrBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Используем асинхронный вызов для предотвращения блокировки UI
+                    setTimeout(() => {
+                        downloadQRCode(id);
+                    }, 10);
+                });
+                
+                // Добавляем карточку в сетку
+                cardGrid.appendChild(cardElement);
+            });
+            
+            // Генерируем пользовательское событие после завершения рендеринга карт
+            document.dispatchEvent(new CustomEvent('cardsRendered'));
+        }
+        
+        // Показать модальное окно для добавления новой карты
+        function showAddCardModal() {
+            const modal = document.getElementById('card-modal');
+            const modalContent = modal.querySelector('.modal-content');
+            
+            document.getElementById('modal-title').innerHTML = '<i class="fas fa-plus-circle"></i> Добавить новую карту';
+            document.getElementById('card-form').reset();
+            
+            // Автоматическое присвоение ID
+            const nextId = generateNextCardId();
+            document.getElementById('card-id').value = nextId;
+            document.getElementById('card-id-display').textContent = nextId;
+            
+            document.getElementById('card-form').setAttribute('data-mode', 'add');
+            
+            modal.style.display = 'flex';
+            // Используем setTimeout для плавной анимации
+            setTimeout(() => {
+                modal.classList.add('active');
+                modalContent.classList.add('active');
+            }, 10);
+        }
+        
+        // Генерация следующего ID карты
+        function generateNextCardId() {
+            const cardIds = Object.keys(cards).sort();
+            let highestNumber = 0;
+            
+            cardIds.forEach(id => {
+                if (id.startsWith('card')) {
+                    const numStr = id.replace('card', '');
+                    const num = parseInt(numStr, 10);
+                    if (!isNaN(num) && num > highestNumber) {
+                        highestNumber = num;
+                    }
+                }
+            });
+            
+            // Увеличиваем на 1 и форматируем с ведущими нулями
+            const nextNumber = highestNumber + 1;
+            return `card${nextNumber.toString().padStart(3, '0')}`;
+        }
+        
+        // Показать модальное окно для редактирования карты
+        function showEditCardModal(id) {
+            const modal = document.getElementById('card-modal');
+            const modalContent = modal.querySelector('.modal-content');
+            
+            document.getElementById('modal-title').innerHTML = '<i class="fas fa-edit"></i> Редактировать карту';
+            
+            const cardData = cards[id];
+            let title, description;
+            
+            if (typeof cardData === 'object' && cardData !== null) {
+                // Новый формат: объект с title и description
+                title = cardData.title || '';
+                description = cardData.description || '';
+            } else if (typeof cardData === 'string') {
+                // Старый формат: строка с форматом "title: description"
+                const parts = cardData.split(':');
+                title = parts[0] ? parts[0].trim() : '';
+                description = parts.length > 1 ? parts.slice(1).join(':').trim() : '';
+            } else {
+                // Неизвестный формат
+                title = '';
+                description = '';
+            }
+            
+            document.getElementById('card-id').value = id;
+            document.getElementById('card-id-display').textContent = id;
+            document.getElementById('card-title').value = title;
+            document.getElementById('card-description').value = description;
+            document.getElementById('card-form').setAttribute('data-mode', 'edit');
+            
+            // Загружаем изображение, если есть
+            const previewImg = document.getElementById('preview-img');
+            const noImagePlaceholder = document.getElementById('no-image-placeholder');
+            const removeImageBtn = document.getElementById('remove-image-btn');
+            
+            if (cardData.imageData) {
+                previewImg.src = cardData.imageData;
+                previewImg.style.display = 'block';
+                noImagePlaceholder.style.display = 'none';
+                removeImageBtn.style.display = 'block';
+            } else {
+                previewImg.src = '';
+                previewImg.style.display = 'none';
+                noImagePlaceholder.style.display = 'block';
+                removeImageBtn.style.display = 'none';
+            }
+            
+            modal.style.display = 'flex';
+            // Используем setTimeout для плавной анимации
+            setTimeout(() => {
+                modal.classList.add('active');
+                modalContent.classList.add('active');
+            }, 10);
+        }
+        
+        // Функция закрытия модального окна с анимацией
+        function closeModal(modal) {
+            // Убираем активный класс с модального окна
+            modal.classList.remove('active');
+            
+            // Проверяем наличие modal-content перед обращением к нему
+            const modalContent = modal.querySelector('.modal-content');
+            if (modalContent) {
+                modalContent.classList.remove('active');
+            }
+            
+            // Ждем завершения анимации перед скрытием модального окна
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+        
+        // Сохранение данных карты
+        function saveCard() {
+            const modal = document.getElementById('card-modal');
+            const mode = modal.getAttribute('data-mode');
+            
+            const id = document.getElementById('card-id').value.trim();
+            const title = document.getElementById('card-title').value.trim();
+            const description = document.getElementById('card-description').value.trim();
+            const previewImg = document.getElementById('preview-img');
+            const imageData = previewImg.style.display !== 'none' ? previewImg.src : null;
+            
+            // Валидация ID карты
+            if (!id.match(/^card\d+$/)) {
+                alert('ID карты должен быть в формате: card001, card002, и т.д.');
+                return;
+            }
+            
+            if (mode === 'add') {
+                // Проверяем, существует ли карта с таким ID
+                if (cards[id]) {
+                    alert('Карта с таким ID уже существует. Пожалуйста, выберите другой ID.');
+                    return;
+                }
+                
+                // Добавляем новую карту
+                cards[id] = {
+                    title: title,
+                    description: description,
+                    imageData: imageData
+                };
+                alert('Карта успешно добавлена!');
+            } else {
+                // Обновляем существующую карту
+                cards[id] = {
+                    title: title,
+                    description: description,
+                    imageData: imageData
+                };
+                alert('Карта успешно обновлена!');
+            }
+            
+            // Закрываем модальное окно и обновляем список карт
+            closeModal(document.getElementById('card-modal'));
+            renderCards();
+            
+            // Сохраняем карты в localStorage
+            saveCards();
+            
+            // Если была загружена новая картинка, сохраняем её информацию отдельно
+            if (imageData && imageData.startsWith('data:image')) {
+                console.log(`Изображение для карты ${id} обновлено`);
+            }
+        }
+        
+        // Удаление карты
+        function deleteCard(id) {
+            if (confirm(`Вы уверены, что хотите удалить карту "${id}"?`)) {
+                delete cards[id];
+                renderCards();
+                saveCards();
+                alert('Карта успешно удалена.');
+            }
+        }
+        
+        // Скачивание QR-кода
+        function downloadQRCode(id) {
+            try {
+                // Находим карточку с нужным ID
+                const cardElement = document.querySelector(`.card-item:has([data-card-id="${id}"])`);
+                if (!cardElement) {
+                    // Пробуем альтернативный способ поиска
+                    const cardItems = document.querySelectorAll('.card-item');
+                    let targetCard = null;
+                    
+                    for (const card of cardItems) {
+                        const idElement = card.querySelector('[data-card-id]');
+                        if (idElement && idElement.textContent === id) {
+                            targetCard = card;
+                            break;
+                        }
+                    }
+                    
+                    if (!targetCard) {
+                        alert(`Ошибка: Карта с ID "${id}" не найдена.`);
+                        return;
+                    }
+                    
+                    const qrCodeContainer = targetCard.querySelector('[data-qr-container]');
+                    if (!qrCodeContainer) {
+                        alert('Ошибка: QR-код не найден в карте.');
+                        return;
+                    }
+                    
+                    const canvas = qrCodeContainer.querySelector('canvas');
+                    if (!canvas) {
+                        alert('Ошибка при загрузке QR-кода. Попробуйте снова.');
+                        return;
+                    }
+                    
+                    // Создаем канвас для правильного экспорта QR-кода
+                    const exportCanvas = document.createElement('canvas');
+                    exportCanvas.width = canvas.width + 40; // Добавляем отступы
+                    exportCanvas.height = canvas.height + 40;
+                    
+                    const ctx = exportCanvas.getContext('2d');
+                    
+                    // Рисуем белый фон
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+                    
+                    // Рисуем QR-код посередине
+                    ctx.drawImage(canvas, 20, 20);
+            
+                    // Создаем ссылку для скачивания
+                    const dataURL = exportCanvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.download = `qr-code-${id}.png`;
+                    link.href = dataURL;
+                    
+                    // Используем более надежный способ скачивания
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    
+                    // Устанавливаем таймаут для предотвращения блокировки UI
+                    setTimeout(() => {
+                        link.click();
+                        setTimeout(() => {
+                            document.body.removeChild(link);
+                            console.log(`QR-код для карты ${id} скачан успешно`);
+                        }, 100);
+                    }, 10);
+                    
+                    return;
+                }
+                
+                const qrCodeContainer = cardElement.querySelector('[data-qr-container]');
+                if (!qrCodeContainer) {
+                    alert('Ошибка: QR-код не найден.');
+                    return;
+                }
+                
+                const canvas = qrCodeContainer.querySelector('canvas');
+                if (!canvas) {
+                    alert('Ошибка при загрузке QR-кода. Попробуйте снова.');
+                    return;
+                }
+                
+                // Создаем канвас для правильного экспорта QR-кода
+                const exportCanvas = document.createElement('canvas');
+                exportCanvas.width = canvas.width + 40; // Добавляем отступы
+                exportCanvas.height = canvas.height + 40;
+                
+                const ctx = exportCanvas.getContext('2d');
+                
+                // Рисуем белый фон
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+                
+                // Рисуем QR-код посередине
+                ctx.drawImage(canvas, 20, 20);
+                
+                // Создаем ссылку для скачивания
+                const dataURL = exportCanvas.toDataURL('image/png');
+                
+                // Используем более надежный способ скачивания
+                const link = document.createElement('a');
+                link.style.display = 'none';
+                link.download = `qr-code-${id}.png`;
+                link.href = dataURL;
+                document.body.appendChild(link);
+                
+                // Используем таймаут для предотвращения блокировки UI
+                setTimeout(() => {
+                    link.click();
+                    setTimeout(() => {
+                        document.body.removeChild(link);
+                        console.log(`QR-код для карты ${id} скачан успешно`);
+                    }, 100);
+                }, 10);
+            } catch (error) {
+                console.error('Ошибка при скачивании QR-кода:', error);
+                alert('Произошла ошибка при скачивании QR-кода. Попробуйте снова.');
+            }
+        }
+        
+        // Сохранение карт в localStorage
+        function saveCards() {
+            localStorage.setItem('designCards', JSON.stringify(cards));
+        }
+        
+        // Загрузка карт из localStorage
+        function loadCards() {
+            const savedCards = localStorage.getItem('designCards');
+            if (savedCards) {
+                try {
+                    const parsedCards = JSON.parse(savedCards);
+                    if (parsedCards && Object.keys(parsedCards).length > 0) {
+                        cards = parsedCards;
+                        console.log('Загружены карты из localStorage:', Object.keys(cards).length);
+                    }
+                } catch (e) {
+                    console.error('Ошибка при загрузке карт из localStorage:', e);
+                }
+            }
+            // Отображаем карты в любом случае - будь то загруженные из localStorage или начальные
+            renderCards();
+        }
+        
+        // Настройка закрытия модальных окон
+        function setupModalClosers() {
+            // Находим все модальные окна
+            const modals = document.querySelectorAll('.card-modal, .fullsize-card-modal');
+            
+            // Для каждого модального окна
+            modals.forEach(modal => {
+                // Находим кнопку закрытия в этом модальном окне
+                const closeBtn = modal.querySelector('.close-modal, .close-fullsize-card');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', function() {
+                        closeModal(modal);
+                    });
+                }
+                
+                // Также добавляем возможность закрыть при клике вне модального окна
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeModal(modal);
+                    }
+                });
+                
+                // Находим кнопки с классом close-btn в модальном окне
+                const closeBtns = modal.querySelectorAll('.close-btn');
+                closeBtns.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        closeModal(modal);
+                    });
+                });
+            });
+            
+            // Добавляем закрытие по нажатию Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.card-modal, .fullsize-card-modal').forEach(modal => {
+                        if (modal.style.display === 'flex') {
+                            closeModal(modal);
+                        }
+                    });
+                }
+            });
+        }
+        
+        // Функция показа карты в полный размер
+        function showFullsizeCardImage(imageSrc, title) {
+            const modal = document.getElementById('fullsize-card-modal');
+            const image = document.getElementById('fullsize-card-image');
+            
+            // Устанавливаем изображение
+            image.src = imageSrc;
+            image.alt = title || 'Карта предсказания';
+            
+            // Отображаем модальное окно
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.classList.add('active');
+            }, 10);
+        }
+        
+        // Функция экспорта карт в JSON файл
+        function exportCards() {
+            try {
+                // Создаем объект для экспорта, исключая данные изображений
+                const exportData = {
+                    cards: {},
+                    exportDate: new Date().toISOString(),
+                    version: '1.0'
+                };
+                
+                // Копируем только необходимые поля (без imageData)
+                Object.keys(cards).forEach(cardId => {
+                    exportData.cards[cardId] = {
+                        title: cards[cardId].title,
+                        description: cards[cardId].description
+                    };
+                });
+                
+                // Преобразуем в строку JSON с отступами для читаемости
+                const jsonString = JSON.stringify(exportData, null, 2);
+                
+                // Создаем Blob с данными JSON
+                const blob = new Blob([jsonString], {type: 'application/json'});
+                
+                // Создаем временную ссылку для скачивания
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                
+                // Форматируем имя файла с текущей датой
+                const now = new Date();
+                const dateStr = now.toISOString().split('T')[0]; // формат YYYY-MM-DD
+                
+                link.href = url;
+                link.download = `mts-design-cards-${dateStr}.json`;
+                
+                // Добавляем ссылку в DOM, кликаем по ней и удаляем
+                document.body.appendChild(link);
+                link.click();
+                
+                // Немного задержки перед удалением ссылки
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    alert('Карты успешно экспортированы!');
+                }, 100);
+            } catch (error) {
+                console.error('Ошибка при экспорте карт:', error);
+                alert('Произошла ошибка при экспорте карт. Пожалуйста, попробуйте еще раз.');
+            }
+        }
+        
+        // Функция импорта карт из JSON файла
+        function importCards(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const importData = JSON.parse(e.target.result);
+                    
+                    // Проверяем структуру импортируемых данных
+                    if (!importData.cards || typeof importData.cards !== 'object') {
+                        throw new Error('Некорректный формат файла импорта');
+                    }
+                    
+                    // Спрашиваем пользователя о способе импорта
+                    const action = confirm('Выберите действие:\n\nНажмите "OK" чтобы заменить все текущие карты импортируемыми.\n\nНажмите "Отмена" чтобы добавить импортируемые карты к существующим.');
+                    
+                    if (action) {
+                        // Заменяем все карты, но сохраняем существующие изображения
+                        const newCards = {};
+                        Object.keys(importData.cards).forEach(cardId => {
+                            newCards[cardId] = importData.cards[cardId];
+                            
+                            // Если такая карта уже существует и у неё есть изображение,
+                            // сохраняем его в новой структуре
+                            if (cards[cardId] && cards[cardId].imageData) {
+                                newCards[cardId].imageData = cards[cardId].imageData;
+                            }
+                        });
+                        cards = newCards;
+                    } else {
+                        // Объединяем с существующими картами, сохраняя данные изображений
+                        Object.keys(importData.cards).forEach(cardId => {
+                            // Если карта уже существует, сохраняем её imageData
+                            const existingImageData = cards[cardId] ? cards[cardId].imageData : null;
+                            
+                            // Добавляем или обновляем карту
+                            cards[cardId] = {
+                                ...importData.cards[cardId],
+                                // Сохраняем существующий imageData, если он есть
+                                imageData: existingImageData
+                            };
+                        });
+                    }
+                    
+                    // Сохраняем и обновляем отображение
+                    saveCards();
+                    renderCards();
+                
+                    alert('Импорт карт успешно выполнен!');
+                    
+                    // Сбрасываем input для возможности повторного импорта
+                    document.getElementById('import-file-input').value = '';
+                    
+                } catch (error) {
+                    console.error('Ошибка при импорте карт:', error);
+                    alert('Произошла ошибка при импорте карт: ' + error.message);
+                }
+            };
+            
+            reader.onerror = function() {
+                alert('Ошибка чтения файла. Пожалуйста, убедитесь, что файл не поврежден.');
+            };
+            
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html> 

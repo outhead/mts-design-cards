@@ -1,0 +1,3236 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель администратора | MTS Design Weekend</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Дополнительные стили для админ-панели */
+        .admin-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .admin-card {
+            background-color: var(--glassmorphism);
+            border-radius: var(--card-radius);
+            padding: 30px;
+            margin-bottom: 30px;
+            border: var(--glassmorphism-border);
+            box-shadow: var(--glassmorphism-shadow);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .admin-card:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+        }
+        
+        .admin-section {
+            margin-bottom: 40px;
+        }
+        
+        .admin-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .admin-heading::after {
+            content: none;
+        }
+        
+        .admin-heading h2 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--white);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+        
+        .card-item {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 25px;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            transition: box-shadow 0.3s ease, background-color 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .card-item::before {
+            content: none;
+        }
+        
+        .card-item:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-item h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 20px;
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .card-item h3::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: var(--primary-gradient);
+            border-radius: 2px;
+        }
+        
+        .card-content {
+            margin: 20px 0;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            border: none;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+        }
+        
+        .btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(227, 6, 19, 0.25);
+        }
+        
+        .btn:focus:not(:focus-visible) {
+            box-shadow: none;
+        }
+        
+        .btn:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(227, 6, 19, 0.25);
+        }
+        
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 13px;
+            border-radius: 8px;
+        }
+        
+        /* Оставляем для обратной совместимости */
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 13px;
+            border-radius: 8px;
+        }
+        
+        /* Новый класс для кнопок с иконками */
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border-radius: 50%;
+            font-size: 16px;
+        }
+        
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 15px rgba(227, 6, 19, 0.3);
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 8px 20px rgba(227, 6, 19, 0.4);
+        }
+        
+        .btn-secondary {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+        }
+        
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #E30613 0%, #C00 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(227, 6, 19, 0.3);
+        }
+        
+        .btn-danger:hover {
+            box-shadow: 0 8px 20px rgba(227, 6, 19, 0.4);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Компактный вариант - 2 столбца */
+            gap: 25px;
+        }
+        
+        .stat-card {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            transition: box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .stat-card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-card::before {
+            content: none;
+        }
+        
+        .stat-icon {
+            font-size: 36px;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            opacity: 0.9;
+        }
+        
+        .stat-value {
+            font-size: 42px;
+            font-weight: bold;
+            margin: 15px 0;
+            color: var(--white);
+            text-shadow: 0 0 10px rgba(227, 6, 19, 0.3);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .stat-label {
+            font-size: 16px;
+            color: var(--dark-gray);
+            margin-top: 10px;
+            font-weight: 500;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background-color: var(--glassmorphism);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            border: var(--glassmorphism-border);
+            box-shadow: var(--glassmorphism-shadow);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .modal-header::after {
+            content: "";
+            position: absolute;
+            bottom: -15px;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background: var(--primary-gradient);
+            border-radius: 3px;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            font-size: 24px;
+            color: var(--white);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--dark-gray);
+            transition: color 0.3s ease, transform 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .close-modal:hover {
+            color: var(--primary-color);
+            transform: rotate(90deg);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(227, 6, 19, 0.25);
+            background-color: rgba(255, 255, 255, 0.07);
+        }
+        
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        /* Дашборд и графики */
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            background-color: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        .data-table th, .data-table td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+        
+        .data-table th {
+            background-color: rgba(255, 255, 255, 0.05);
+            font-weight: 600;
+            color: var(--white);
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+        
+        .data-table tr:hover td {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        /* Анимации */
+        @keyframes pulseButton {
+            0% {
+                box-shadow: 0 0 0 0 rgba(227, 6, 19, 0.6);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(227, 6, 19, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(227, 6, 19, 0);
+            }
+        }
+        
+        #add-card-btn, #generate-qr-btn {
+            animation: pulseButton 2s infinite;
+        }
+        
+        /* Адаптивный дизайн для больших экранов */
+        @media (min-width: 1800px) {
+            .admin-container {
+                width: 98%;
+                max-width: 2200px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 30px;
+            }
+            
+            .stat-card {
+                min-height: 220px;
+                padding: 30px;
+            }
+            
+            .stat-value {
+                font-size: 56px;
+            }
+            
+            .stat-icon {
+                font-size: 42px;
+            }
+            
+            .card-list {
+                grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            }
+            
+            .admin-heading h2 {
+                font-size: 32px;
+            }
+        }
+        
+        /* Дашборд для широких экранов */
+        @media (min-width: 1280px) {
+            .admin-container {
+                width: 95%;
+                max-width: 1800px;
+            }
+            
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 25px;
+                width: 100%;
+            }
+
+            .stat-card {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                min-height: 180px;
+            }
+
+            .stat-value {
+                font-size: 48px;
+            }
+            
+            .chart-container {
+                height: 380px;
+                margin-top: 30px;
+                padding: 25px;
+            }
+        }
+        
+        /* Только дополнительные улучшения для очень широких экранов */
+        @media (min-width: 1800px) {
+            .admin-container {
+                width: 98%;
+                max-width: 2200px;
+            }
+            
+            .admin-heading h2 {
+                font-size: 32px;
+            }
+            
+            .chart-container {
+                height: 450px;
+                padding: 30px;
+            }
+            
+            .card-list {
+                grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            }
+            
+            .stat-card {
+                min-height: 220px;
+                padding: 30px;
+            }
+            
+            .stat-value {
+                font-size: 56px;
+            }
+            
+            .stat-icon {
+                font-size: 42px;
+            }
+        }
+        
+        /* Новый дашборд с двумя колонками */
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-top: 25px;
+        }
+        
+        .dashboard-column {
+            width: 100%;
+        }
+        
+        .activities-container {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 25px;
+            height: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            overflow: hidden;
+        }
+        
+        .activities-container h3 {
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: var(--white);
+            border-bottom: 2px solid rgba(227, 6, 19, 0.5);
+            padding-bottom: 15px;
+        }
+        
+        .activity-list {
+            overflow-y: auto;
+            max-height: 600px;
+            padding-right: 10px;
+        }
+        
+        .activity-item {
+            display: flex;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            opacity: 1;
+            position: relative;
+        }
+        
+        .activity-item:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .activity-item::after {
+            content: "×";
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 18px;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .activity-item:hover::after {
+            opacity: 1;
+        }
+        
+        .activity-icon {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(227, 6, 19, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: #E30613;
+            font-size: 16px;
+        }
+        
+        .activity-content {
+            flex-grow: 1;
+        }
+        
+        .activity-type {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--white);
+        }
+        
+        .activity-details {
+            color: rgba(255, 255, 255, 0.8);
+            font-style: italic;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        .activity-time {
+            font-size: 12px;
+            color: var(--dark-gray);
+        }
+        
+        .empty-message {
+            text-align: center;
+            padding: 30px;
+            color: var(--dark-gray);
+            font-style: italic;
+        }
+        
+        .activity-card {
+            display: inline-block;
+            background-color: rgba(227, 6, 19, 0.2);
+            color: #E30613;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+        
+        /* Медиа-запросы для адаптивности */
+        @media (min-width: 1280px) {
+            .dashboard-container {
+                flex-direction: row;
+            }
+            
+            .dashboard-column {
+                width: 50%;
+            }
+            
+            .activities-container {
+                height: calc(100% - 30px); /* Учитываем отступы */
+                min-height: 600px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+        }
+        
+        @media (min-width: 1800px) {
+            .activity-list {
+                max-height: 800px;
+            }
+        }
+        
+        /* Стили для кнопок отладки */
+        .debug-btn-group {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 9999;
+            display: flex;
+            gap: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .debug-btn {
+            background-color: #444;
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            flex: 1;
+            min-width: 60px;
+            max-width: 90px;
+        }
+        
+        .debug-btn:hover {
+            background-color: #555;
+            transform: translateY(-2px);
+        }
+        
+        .debug-btn.primary {
+            background-color: #2196F3;
+        }
+        
+        .debug-btn.primary:hover {
+            background-color: #1976D2;
+        }
+        
+        .debug-btn.danger {
+            background-color: #E30613;
+        }
+        
+        .debug-btn.danger:hover {
+            background-color: #D00;
+        }
+        
+        .debug-btn.success {
+            background-color: #107c10;
+        }
+        
+        .debug-btn.success:hover {
+            background-color: #0a6b0a;
+        }
+        
+        .debug-panel-buttons {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        
+        /* Стилизация панели отладки в соответствии с основным дизайном */
+        #debug-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--glassmorphism, rgba(30, 30, 30, 0.85));
+            padding: 15px;
+            border-radius: var(--card-radius, 16px);
+            z-index: 9999;
+            max-width: 450px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 13px;
+            display: none;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        #debug-panel h3 {
+            margin: 0;
+            padding: 0;
+            border-bottom: none;
+            color: var(--white);
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        #debug-panel h3::before {
+            content: "\f085";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            color: var(--primary-color, #E30613);
+        }
+        
+        #debug-panel strong {
+            color: var(--primary-color, #E30613);
+            font-weight: 500;
+        }
+        
+        #debug-panel pre {
+            margin: 3px 0;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            max-height: 120px;
+            overflow: auto;
+            color: #4CAF50;
+            font-family: monospace;
+            font-size: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+        
+        .debug-section {
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .debug-section strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #ddd;
+        }
+        
+        /* Стили для вкладок в отладочной панели */
+        .debug-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 5px;
+        }
+        
+        .debug-tab {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .debug-tab:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .debug-tab.active {
+            background: transparent;
+            color: white;
+            border-bottom: 2px solid var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .debug-tab-content {
+            display: none;
+        }
+        
+        .debug-tab-content.active {
+            display: block;
+        }
+        
+        @media (max-width: 600px) {
+            .debug-btn-group {
+                flex-direction: column;
+                left: 10px;
+                bottom: 10px;
+            }
+            
+            .debug-btn {
+                min-width: auto;
+                max-width: none;
+                width: 100%;
+                padding: 5px 8px;
+                font-size: 11px;
+                margin-bottom: 5px;
+            }
+            
+            #debug-panel {
+                max-width: 90%;
+                left: 5%;
+                right: 5%;
+            }
+        }
+        
+        /* Добавляем стили для кнопок успеха и опасности */
+        .btn-success {
+            background: linear-gradient(135deg, #107c10 0%, #0a6b0a 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 124, 16, 0.3);
+        }
+        
+        .btn-success:hover {
+            box-shadow: 0 8px 20px rgba(16, 124, 16, 0.4);
+            transform: translateY(-3px);
+        }
+    </style>
+    
+    <!-- Основной файл приложения -->
+    <script src="js/app-main.js"></script>
+    
+    <!-- Необходимые для админки скрипты -->
+    <script src="js/admin.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Остальные скрипты загружаются динамически через app-main.js -->
+</head>
+<body>
+    <div class="admin-container">
+        <main>
+            <!-- Секция статистики и активностей -->
+            <section class="admin-section">
+                <div class="admin-heading">
+                    <h2>Карты предсказаний от МТС</h2>
+                    <button class="btn btn-icon btn-secondary" id="refresh-stats" data-analytics="refresh-stats" aria-label="Обновить статистику"><i class="fas fa-sync-alt"></i></button>
+                </div>
+                
+                <!-- Контейнер для разделения на 2 колонки -->
+                <div class="dashboard-container">
+                    <!-- Левая колонка - статистика -->
+                    <div class="dashboard-column">
+                        <div class="stats-grid">
+                            <div class="stat-card" data-analytics="view-users-stat">
+                                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                                <div class="stat-value" id="total-users">0</div>
+                                <div class="stat-label">Пользователей всего</div>
+                            </div>
+                            
+                            <div class="stat-card" data-analytics="view-predictions-stat">
+                                <div class="stat-icon"><i class="fas fa-magic"></i></div>
+                                <div class="stat-value" id="total-predictions">0</div>
+                                <div class="stat-label">Предсказаний сделано</div>
+                            </div>
+                            
+                            <div class="stat-card" data-analytics="view-today-stat">
+                                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                                <div class="stat-value" id="today-predictions">0</div>
+                                <div class="stat-label">Предсказаний сегодня</div>
+                            </div>
+                            
+                            <div class="stat-card" data-analytics="view-shares-stat">
+                                <div class="stat-icon"><i class="fas fa-share-alt"></i></div>
+                                <div class="stat-value" id="total-shares">0</div>
+                                <div class="stat-label">Поделились результатом</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Правая колонка - активности -->
+                    <div class="dashboard-column">
+                        <div class="activities-container" style="height: 100%;">
+                            <div class="admin-heading" style="margin-bottom: 15px;">
+                                <h3>Вопросы пользователей</h3>
+                            </div>
+                            <div class="activity-list" id="activities-list" style="max-height: none; height: calc(100% - 50px);">
+                                <!-- Здесь будут отображаться вопросы пользователей -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Правая колонка - пользователи (скрытый блок) -->
+                    <!-- Блок визуально скрыт, но функциональность счетчика пользователей сохранена -->
+                    <div class="dashboard-column" style="display: none;">
+                        <div class="activities-container" style="height: 100%;">
+                            <div class="admin-heading" style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                                <h3>Пользователи</h3>
+                                <button id="refresh-users" class="btn btn-icon btn-secondary" aria-label="Обновить список пользователей">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                            <div class="activity-list" id="users-list" style="max-height: none; height: calc(100% - 50px);">
+                                <!-- Здесь будут отображаться пользователи -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Увеличиваем отступ между секциями в 4 раза -->
+            <section class="admin-section" style="margin-top: 160px;">
+                <!-- Контейнер для разделения на 2 колонки -->
+                <div class="dashboard-container" style="margin-top: 80px;">
+                    <!-- Левая колонка - управление картами -->
+                    <div class="dashboard-column">
+                        <div class="admin-card">
+                            <div class="admin-heading">
+                                <h2><i class="fas fa-cards"></i> Управление картами</h2>
+                                <a href="cards-manager.html" class="btn btn-secondary" aria-label="Перейти к управлению картами"><i class="fas fa-external-link-alt"></i> Перейти</a>
+                            </div>
+                            
+                            <div style="margin-top: 20px;">
+                                <p>В разделе управления картами вы можете:</p>
+                                <ul style="margin-left: 20px; margin-top: 10px; color: var(--dark-gray);">
+                                    <li>Добавлять новые карты и их описания</li>
+                                    <li>Редактировать существующие карты</li>
+                                    <li>Генерировать QR-коды для каждой карты</li>
+                                    <li>Управлять всеми метафорами и предсказаниями</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Правая колонка - инструменты и отладка -->
+                    <div class="dashboard-column">
+                        <div class="admin-card" style="height: 100%;">
+                            <div class="admin-heading">
+                                <h2><i class="fas fa-tools"></i> Настройки и отладка</h2>
+                            </div>
+                            <div style="display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap;">
+                                <button class="btn btn-primary" id="debug-panel-btn" data-analytics="debug-panel" aria-label="Открыть панель отладки"><i class="fas fa-bug"></i> Отладка</button>
+                                <button class="btn btn-secondary" id="gpt-settings-btn" data-analytics="gpt-settings" aria-label="Открыть настройки API GPT"><i class="fas fa-robot"></i> Настройки API</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <footer style="text-align: center; margin-top: 50px; color: var(--dark-gray); font-size: 14px;">
+            <p>&copy; 2025 MTS Design Weekend | Панель администратора v1.0</p>
+        </footer>
+    </div>
+    
+    <!-- Модальное окно для добавления/редактирования карты -->
+    <div class="modal" id="card-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title"><i class="fas fa-edit"></i> Редактирование карты</h3>
+                <button class="close-modal btn btn-icon" aria-label="Закрыть">&times;</button>
+            </div>
+            
+            <form id="card-form">
+                <div class="form-group">
+                    <label for="card-id">ID карты:</label>
+                    <input type="text" id="card-id" class="form-control" placeholder="design000" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="card-title">Название/метафора:</label>
+                    <input type="text" id="card-title" class="form-control" placeholder="Название карты" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="card-description">Описание:</label>
+                    <textarea id="card-description" class="form-control" rows="4" placeholder="Описание метафоры карты"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="card-image">Изображение карты:</label>
+                    <input type="file" id="card-image" class="form-control" accept="image/*">
+                </div>
+                
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button type="submit" class="btn btn-primary" aria-label="Сохранить изменения"><i class="fas fa-save"></i> Сохранить</button>
+                    <button type="button" class="btn btn-secondary close-btn" aria-label="Отменить и закрыть"><i class="fas fa-times"></i> Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- JavaScript модули загружаются через app-main.js -->
+    <script>
+        // Инициализация модуля статистики вручную
+        console.log('Подключение и инициализация модуля статистики...');
+        if (window.statsModule && typeof window.statsModule.init === 'function') {
+            window.statsModule.init();
+            console.log('Модуль статистики успешно инициализирован');
+            
+            // Явно вызываем пересчет пользователей
+            if (typeof window.statsModule.countRegisteredUsers === 'function') {
+                setTimeout(function() {
+                    console.log('Запуск пересчета количества пользователей...');
+                    const userCount = window.statsModule.countRegisteredUsers();
+                    console.log('Пересчет пользователей завершен, текущее количество:', userCount);
+                }, 500);
+            }
+        }
+        
+        // Обработчики событий для кнопок
+        document.addEventListener('DOMContentLoaded', function() {
+            // Кнопка обновления статистики
+            const refreshStatsBtn = document.getElementById('refresh-stats');
+            if (refreshStatsBtn) {
+                refreshStatsBtn.addEventListener('click', function() {
+                    if (window.refreshStats) window.refreshStats();
+                });
+            }
+        });
+    </script>
+    <!-- Админ-скрипты и библиотеки уже подключены в head -->
+    
+    <script>
+        // Инициализация графиков
+        document.addEventListener('DOMContentLoaded', function() {
+            // Вызываем функцию настройки модальных окон
+            setupModalClosers();
+            
+            // Инициализация системы и загрузка реальных данных из admin.js
+            if (typeof initAdmin === 'function') {
+                initAdmin();
+            }
+            
+            // Добавляем автообновление статистики
+            setupAutoRefresh();
+            
+            // Настраиваем кнопку "Настройки" для открытия панели отладки
+            const debugPanelBtn = document.getElementById('debug-panel-btn');
+            if (debugPanelBtn) {
+                debugPanelBtn.addEventListener('click', function() {
+                    const debugPanel = document.getElementById('debug-panel');
+                    if (debugPanel) {
+                        debugPanel.style.display = 'block';
+                        if (typeof updateDebugInfo === 'function') {
+                            updateDebugInfo();
+                        }
+                    }
+                });
+            }
+        });
+        
+        // Функция настройки модальных окон
+        function setupModalClosers() {
+            // Находим все модальные окна
+            const modals = document.querySelectorAll('.modal');
+            
+            // Для каждого модального окна
+            modals.forEach(modal => {
+                // Находим кнопку закрытия в этом модальном окне
+                const closeBtn = modal.querySelector('.close-modal');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', function() {
+                        modal.style.display = 'none';
+                    });
+                }
+                
+                // Также добавляем возможность закрыть при клике вне модального окна
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+                
+                // Находим кнопки с классом close-btn в модальном окне
+                const closeBtns = modal.querySelectorAll('.close-btn');
+                closeBtns.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        modal.style.display = 'none';
+                    });
+                });
+            });
+            
+            // Добавляем закрытие по нажатию Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.modal').forEach(modal => {
+                        if (modal.style.display === 'flex') {
+                            modal.style.display = 'none';
+                        }
+                    });
+                }
+            });
+        }
+        
+        // Функция автообновления статистики
+        function setupAutoRefresh() {
+            // Переменная для хранения идентификатора интервала
+            window.autoRefreshInterval = null;
+            
+            // Функция для обновления данных
+            function refreshStats() {
+                console.log('Автообновление статистики...');
+                
+                // Проверяем, доступен ли метод пересчета пользователей
+                if (window.statsModule && typeof window.statsModule.countRegisteredUsers === 'function') {
+                    window.statsModule.countRegisteredUsers();
+                }
+                
+                // Загружаем свежие данные из localStorage
+                const savedStats = localStorage.getItem('appStats');
+                if (savedStats) {
+                    try {
+                        const parsedStats = JSON.parse(savedStats);
+                        
+                        // Обновляем объект adminStats значениями из хранилища
+                        if (window.adminStats) {
+                            Object.assign(window.adminStats, parsedStats);
+                        } else {
+                            window.adminStats = parsedStats;
+                        }
+                        
+                        // Обновляем UI
+                        const elements = {
+                            totalUsers: document.getElementById('total-users'),
+                            totalPredictions: document.getElementById('total-predictions'),
+                            todayPredictions: document.getElementById('today-predictions'),
+                            totalShares: document.getElementById('total-shares')
+                        };
+                        
+                        // Проверяем существование элементов перед обновлением
+                        if (elements.totalUsers) {
+                            elements.totalUsers.textContent = parsedStats.totalUsers || '0';
+                            console.log('Обновлен элемент total-users:', parsedStats.totalUsers);
+                        } else {
+                            console.warn('Элемент total-users не найден');
+                        }
+                        
+                        if (elements.totalPredictions) {
+                            elements.totalPredictions.textContent = parsedStats.totalPredictions || '0';
+                            console.log('Обновлен элемент total-predictions:', parsedStats.totalPredictions);
+                        } else {
+                            console.warn('Элемент total-predictions не найден');
+                        }
+                        
+                        if (elements.todayPredictions) {
+                            elements.todayPredictions.textContent = parsedStats.todayPredictions || '0';
+                            console.log('Обновлен элемент today-predictions:', parsedStats.todayPredictions);
+                        } else {
+                            console.warn('Элемент today-predictions не найден');
+                        }
+                        
+                        if (elements.totalShares) {
+                            elements.totalShares.textContent = parsedStats.shares || '0';
+                            console.log('Обновлен элемент total-shares:', parsedStats.shares);
+                        } else {
+                            console.warn('Элемент total-shares не найден');
+                        }
+                        
+                        // Обновляем отладочную информацию, если функция существует
+                        if (typeof updateDebugInfo === 'function') {
+                            updateDebugInfo();
+                        }
+                        
+                        console.log('Статистика успешно обновлена из localStorage:', parsedStats);
+                        return true;
+                    } catch (e) {
+                        console.error('Ошибка при загрузке статистики из localStorage:', e);
+                    }
+                } else {
+                    console.warn('Данные статистики не найдены в localStorage');
+                }
+                
+                return false;
+            }
+            
+            // Устанавливаем функцию refreshStats глобально
+            window.refreshStats = refreshStats;
+            
+            // Функция для включения/выключения автообновления
+            function toggleAutoRefresh(enable) {
+                if (enable) {
+                    if (!window.autoRefreshInterval) {
+                        window.autoRefreshInterval = setInterval(refreshStats, 4000);
+                        console.log('Автообновление включено (каждые 4 секунды)');
+                        return true;
+                    }
+                } else {
+                    if (window.autoRefreshInterval) {
+                        clearInterval(window.autoRefreshInterval);
+                        window.autoRefreshInterval = null;
+                        console.log('Автообновление выключено');
+                        return false;
+                    }
+                }
+            }
+            
+            // Добавляем кнопку управления автообновлением в контейнер отладочной панели
+            const debugPanel = document.getElementById('debug-panel');
+            if (debugPanel) {
+                const buttonContainer = debugPanel.querySelector('div[style*="display: flex"]');
+                if (buttonContainer) {
+                    // Проверяем, что кнопки еще нет
+                    if (!document.getElementById('auto-refresh-toggle')) {
+                        const autoRefreshBtn = document.createElement('button');
+                        autoRefreshBtn.textContent = 'Авто ВКЛ';
+                        autoRefreshBtn.id = 'auto-refresh-toggle';
+                        autoRefreshBtn.style.background = '#2196F3';
+                        autoRefreshBtn.style.color = 'white';
+                        autoRefreshBtn.style.border = 'none';
+                        autoRefreshBtn.style.padding = '4px 8px';
+                        autoRefreshBtn.style.borderRadius = '5px';
+                        autoRefreshBtn.style.cursor = 'pointer';
+                        autoRefreshBtn.style.fontSize = '10px';
+                        
+                        autoRefreshBtn.addEventListener('click', function() {
+                            const isActive = this.getAttribute('data-active') === 'true';
+                            const newState = !isActive;
+                            
+                            toggleAutoRefresh(newState);
+                            
+                            this.setAttribute('data-active', newState);
+                            this.textContent = newState ? 'Авто ВЫКЛ' : 'Авто ВКЛ';
+                            this.style.background = newState ? '#F44336' : '#2196F3';
+                        });
+                        
+                        buttonContainer.appendChild(autoRefreshBtn);
+                        console.log('Кнопка автообновления добавлена на отладочную панель');
+                    }
+                }
+            }
+            
+            // Включаем автообновление по умолчанию
+            toggleAutoRefresh(true);
+            
+            // Добавляем обработчик для кнопки "Обновить"
+            const refreshBtn = document.getElementById('refresh-stats');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', refreshStats);
+            }
+            
+            // Добавляем обработчик события обновления статистики
+            window.addEventListener('stats-updated', function(e) {
+                console.log('Получено событие обновления статистики:', e.detail);
+                refreshStats();
+            });
+            
+            // Сразу вызываем обновление при инициализации
+            refreshStats();
+        }
+    </script>
+
+    <!-- Отладочная панель для тестирования системы статистики -->
+    <div id="debug-panel" class="admin-card" style="display: none; position: fixed; bottom: 0; right: 0; width: 450px; height: auto; max-height: 80vh; overflow-y: auto; z-index: 1000; margin: 0; padding: 20px; border-top-left-radius: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0; font-size: 20px;"><i class="fas fa-bug"></i> Отладка системы</h3>
+            <button id="debug-close" class="btn btn-icon btn-sm" style="width: 32px; height: 32px;" aria-label="Закрыть панель отладки"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="debug-tabs" style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button class="btn btn-sm debug-tab active" data-tab="stats" aria-label="Показать вкладку статистики">Статистика</button>
+            <button class="btn btn-sm debug-tab" data-tab="actions" aria-label="Показать вкладку действий">Действия</button>
+        </div>
+
+        <div id="debug-tab-stats" class="debug-tab-content active">
+            <div class="debug-section">
+                <strong>LocalStorage (appStats):</strong>
+                <pre id="debug-localStorage" style="background-color: rgba(0, 0, 0, 0.1); padding: 10px; border-radius: 8px; max-height: 120px;"></pre>
+            </div>
+            <div class="debug-section">
+                <strong>statsModule:</strong>
+                <pre id="debug-statsModule" style="background-color: rgba(0, 0, 0, 0.1); padding: 10px; border-radius: 8px; max-height: 120px;"></pre>
+            </div>
+            <div class="debug-section">
+                <strong>adminStats:</strong>
+                <pre id="debug-adminStats" style="background-color: rgba(0, 0, 0, 0.1); padding: 10px; border-radius: 8px; max-height: 120px;"></pre>
+            </div>
+            <div class="debug-section">
+                <strong>UI элементы:</strong>
+                <pre id="debug-ui" style="background-color: rgba(0, 0, 0, 0.1); padding: 10px; border-radius: 8px; max-height: 120px;"></pre>
+            </div>
+        </div>
+
+        <div id="debug-tab-actions" class="debug-tab-content" style="display:none;">
+            <div class="debug-section">
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px;">
+                    <button id="debug-refresh" class="btn btn-sm btn-primary" aria-label="Обновить данные"><i class="fas fa-sync-alt"></i> Обновить</button>
+                    <button id="debug-test" class="btn btn-sm btn-success" aria-label="Добавить тестовое значение"><i class="fas fa-plus"></i> Тест +1</button>
+                    <button id="debug-reset" class="btn btn-sm btn-danger" aria-label="Сбросить все данные"><i class="fas fa-trash-alt"></i> Сброс</button>
+                </div>
+            </div>
+            <div class="debug-section">
+                <strong>Управление пользователями:</strong>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px;">
+                    <button id="register-user" class="btn btn-sm btn-success" aria-label="Добавить пользователя"><i class="fas fa-user-plus"></i> Добавить пользователя</button>
+                    <button id="recount-users" class="btn btn-sm btn-primary" aria-label="Пересчитать пользователей"><i class="fas fa-sync"></i> Пересчитать</button>
+                    <button id="reset-users" class="btn btn-sm btn-danger" aria-label="Сбросить счетчик пользователей" style="grid-column: span 2;"><i class="fas fa-user-times"></i> Сбросить счетчик пользователей</button>
+                </div>
+            </div>
+            <div class="debug-section">
+                <strong>Поиск вопросов:</strong>
+                <div style="margin-top: 10px;">
+                    <button id="toggle-auto-questions" class="btn btn-sm btn-primary" style="width: 100%;" aria-label="Включить/выключить автопоиск вопросов"><i class="fas fa-search"></i> Авто-поиск ВКЛ</button>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+            <button id="auto-refresh-toggle" class="btn btn-sm btn-primary" style="width: 48%;" aria-label="Включить/выключить автообновление"><i class="fas fa-clock"></i> Автообновление ВКЛ</button>
+            <button id="reset-all-data" class="btn btn-sm btn-danger" style="width: 48%;" aria-label="Сбросить все данные"><i class="fas fa-exclamation-triangle"></i> Сбросить все данные</button>
+        </div>
+    </div>
+
+    <!-- Удалена отладочная панель для активностей, так как теперь кнопка находится в общей группе -->
+
+    <script>
+        // Функции для автоматического поиска вопросов
+        // Флаг для определения, включен ли автоматический поиск вопросов
+        window.autoFindQuestionsEnabled = false;
+        window.autoSearchInterval = null;
+        
+        // Функция для анализа localStorage и поиска вопросов
+        function findRealQuestions() {
+            if (!window.autoFindQuestionsEnabled) {
+                console.log('Автоматический поиск вопросов отключен');
+                return [];
+            }
+            
+            console.log('Запуск автоматического поиска вопросов пользователей...');
+            
+            // Получаем все ключи
+            const allKeys = Object.keys(localStorage);
+            console.log('Всего ключей в localStorage:', allKeys.length);
+            
+            // Массив для хранения найденных вопросов
+            let foundQuestions = [];
+            
+            // Проверяем каждый ключ
+            allKeys.forEach(key => {
+                try {
+                    const value = localStorage.getItem(key);
+                    if (!value) return;
+                    
+                    // Пытаемся распарсить как JSON
+                    try {
+                        const parsed = JSON.parse(value);
+                        
+                        // Массив
+                        if (Array.isArray(parsed)) {
+                            // Ищем вопросы в массиве объектов
+                            parsed.forEach(item => {
+                                const isQuestion = 
+                                    (item && item.type === 'question') || 
+                                    (item && item.details && item.details.includes('?')) ||
+                                    (item && item.question) ||
+                                    (item && item.text && item.text.includes('?'));
+                                
+                                if (isQuestion) {
+                                    // Преобразуем в стандартный формат
+                                    foundQuestions.push({
+                                        id: item.id || ('found-' + Math.random().toString(36).substring(2, 9)),
+                                        timestamp: item.timestamp || new Date().toISOString(),
+                                        userId: item.userId || item.user || 'unknown',
+                                        type: 'question',
+                                        details: item.details || item.text || item.question || '[Вопрос без текста]',
+                                        cardId: item.cardId || null,
+                                        source: key // добавляем источник
+                                    });
+                                }
+                            });
+                        }
+                        // Объект
+                        else if (typeof parsed === 'object' && parsed !== null) {
+                            // Проверяем ключи на наличие вопросов
+                            for (const [k, v] of Object.entries(parsed)) {
+                                if (k.includes('question') || (typeof v === 'string' && v.includes('?'))) {
+                                    foundQuestions.push({
+                                        id: 'found-' + Math.random().toString(36).substring(2, 9),
+                                        timestamp: new Date().toISOString(),
+                                        userId: 'unknown',
+                                        type: 'question',
+                                        details: typeof v === 'string' ? v : k,
+                                        cardId: null,
+                                        source: key
+                                    });
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        // Не JSON, проверяем строку на наличие вопросов
+                        if (value.includes('?')) {
+                            // Извлекаем возможные вопросы по знаку вопроса
+                            const parts = value.split('?');
+                            parts.slice(0, -1).forEach((part, index) => {
+                                // Берем часть до знака вопроса и добавляем его обратно
+                                const question = (part.split('.').pop() || part) + '?';
+                                if (question.length > 5) { // Избегаем слишком коротких фрагментов
+                                    foundQuestions.push({
+                                        id: 'found-' + Math.random().toString(36).substring(2, 9),
+                                        timestamp: new Date().toISOString(),
+                                        userId: 'extracted',
+                                        type: 'question',
+                                        details: question,
+                                        cardId: null,
+                                        source: key
+                                    });
+                                }
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.error('Ошибка при анализе ключа', key, e);
+                }
+            });
+            
+            console.log('Всего найдено вопросов:', foundQuestions.length);
+            
+            // Удаляем дубликаты по содержимому вопроса
+            const questionTexts = new Set();
+            foundQuestions = foundQuestions.filter(q => {
+                if (questionTexts.has(q.details)) {
+                    return false;
+                }
+                questionTexts.add(q.details);
+                return true;
+            });
+            
+            console.log('Уникальных вопросов:', foundQuestions.length);
+            
+            return foundQuestions;
+        }
+        
+        // Функция для отображения найденных вопросов
+        function displayFoundQuestions(questions) {
+            // Получаем контейнер для активностей
+            const activitiesContainer = document.getElementById('activities-list');
+            if (!activitiesContainer) {
+                console.error('Контейнер для вопросов не найден в DOM');
+                return false;
+            }
+            
+            // Очищаем контейнер
+            activitiesContainer.innerHTML = '';
+            
+            // Если не найдено вопросов, показываем сообщение
+            if (!questions || questions.length === 0) {
+                const emptyMessage = document.createElement('div');
+                emptyMessage.className = 'empty-message';
+                emptyMessage.textContent = 'Вопросы пользователей не найдены в localStorage';
+                activitiesContainer.appendChild(emptyMessage);
+                return false;
+            }
+            
+            // Сортируем вопросы по дате (новые сверху)
+            const sortedQuestions = [...questions].sort((a, b) => {
+                // Используем try-catch на случай некорректных дат
+                try {
+                    return new Date(b.timestamp) - new Date(a.timestamp);
+                } catch (e) {
+                    return 0;
+                }
+            });
+            
+            // Создаем элементы для каждого вопроса
+            sortedQuestions.forEach(activity => {
+                const activityItem = document.createElement('div');
+                activityItem.className = 'activity-item';
+                
+                // Форматируем дату
+                let formattedDate = 'Дата неизвестна';
+                try {
+                    const date = new Date(activity.timestamp);
+                    formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+                } catch (e) {
+                    console.warn('Ошибка форматирования даты', activity.timestamp);
+                }
+                
+                // Создаем HTML для вопроса
+                activityItem.innerHTML = `
+                    <div class="activity-icon"><i class="fas fa-question"></i></div>
+                    <div class="activity-content">
+                        <div class="activity-details">${activity.details || ''}</div>
+                        <div class="activity-time">${formattedDate}</div>
+                    </div>
+                `;
+                
+                // Добавляем обработчик клика для скрытия вопроса
+                activityItem.addEventListener('click', function() {
+                    // Добавляем анимацию исчезновения
+                    this.style.opacity = '0';
+                    this.style.transform = 'translateX(20px)';
+                    
+                    // После анимации удаляем элемент
+                    setTimeout(() => {
+                        this.remove();
+                        
+                        // Также удаляем этот вопрос из массива и localStorage
+                        if (window.activities) {
+                            // Находим индекс вопроса в массиве по его содержимому
+                            const questionIndex = window.activities.findIndex(q => 
+                                q.details === activity.details);
+                            
+                            if (questionIndex !== -1) {
+                                // Удаляем вопрос из массива
+                                window.activities.splice(questionIndex, 1);
+                                
+                                // Обновляем localStorage
+                                try {
+                                    localStorage.setItem('userActivities', JSON.stringify(window.activities));
+                                    console.log('Вопрос удален и данные обновлены в localStorage');
+                                } catch (e) {
+                                    console.error('Ошибка при обновлении localStorage:', e);
+                                }
+                            }
+                        }
+                        
+                        // Показываем уведомление
+                        if (window.showNotification) {
+                            window.showNotification('Вопрос скрыт', 'success');
+                        }
+                    }, 300);
+                });
+                
+                // Добавляем элемент в контейнер
+                activitiesContainer.appendChild(activityItem);
+            });
+            
+            console.log(`Отображено ${sortedQuestions.length} вопросов пользователей`);
+            
+            // Также сохраняем найденные вопросы в переменную activities и localStorage
+            window.activities = sortedQuestions;
+            try {
+                localStorage.setItem('userActivities', JSON.stringify(sortedQuestions));
+                console.log('Найденные вопросы сохранены в localStorage');
+            } catch (e) {
+                console.error('Ошибка при сохранении вопросов в localStorage', e);
+            }
+            
+            return true;
+        }
+        
+        // Функция для запуска и остановки автопоиска
+        function toggleAutoSearch(enable) {
+            if (enable) {
+                // Запускаем поиск каждые 2 секунды
+                window.autoFindQuestionsEnabled = true;
+                
+                // Сначала делаем первый запрос сразу
+                const questions = findRealQuestions();
+                displayFoundQuestions(questions);
+                
+                // Потом ставим на интервал
+                if (!window.autoSearchInterval) {
+                    window.autoSearchInterval = setInterval(() => {
+                        const questions = findRealQuestions();
+                        displayFoundQuestions(questions);
+                    }, 2000); // Каждые 2 секунды
+                    
+                    console.log('Автоматический поиск вопросов запущен (с интервалом 2 сек)');
+                }
+                
+                return true;
+            } else {
+                // Останавливаем поиск
+                window.autoFindQuestionsEnabled = false;
+                
+                if (window.autoSearchInterval) {
+                    clearInterval(window.autoSearchInterval);
+                    window.autoSearchInterval = null;
+                    console.log('Автоматический поиск вопросов остановлен');
+                }
+                
+                return false;
+            }
+        }
+    </script>
+
+    <script>
+        // Инициализация отладочной панели
+        document.addEventListener('DOMContentLoaded', function() {
+            // Закрытие панели отладки
+            document.getElementById('debug-close').addEventListener('click', function() {
+                document.getElementById('debug-panel').style.display = 'none';
+            });
+            
+            // Инициализация вкладок в отладочной панели
+            const tabButtons = document.querySelectorAll('.debug-tab');
+            tabButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Удаляем активный класс у всех вкладок
+                    tabButtons.forEach(tab => tab.classList.remove('active'));
+                    // Добавляем активный класс текущей вкладке
+                    this.classList.add('active');
+                    
+                    // Скрываем все контенты вкладок
+                    const tabContents = document.querySelectorAll('.debug-tab-content');
+                    tabContents.forEach(content => content.style.display = 'none');
+                    
+                    // Показываем нужный контент
+                    const tabToShow = this.getAttribute('data-tab');
+                    document.getElementById('debug-tab-' + tabToShow).style.display = 'block';
+                });
+            });
+            
+            // Добавляем обработчик для кнопки авто-поиска
+            const toggleAutoBtn = document.getElementById('toggle-auto-questions');
+            if (toggleAutoBtn) {
+                toggleAutoBtn.addEventListener('click', function() {
+                    const newState = !window.autoFindQuestionsEnabled;
+                    toggleAutoSearch(newState);
+                    
+                    this.innerHTML = window.autoFindQuestionsEnabled ? 
+                        '<i class="fas fa-search"></i> Авто-поиск ВКЛ' : 
+                        '<i class="fas fa-search-minus"></i> Авто-поиск ВЫКЛ';
+                    this.className = window.autoFindQuestionsEnabled ? 
+                        'debug-btn primary' : 
+                        'debug-btn danger';
+                    
+                    if (window.autoFindQuestionsEnabled) {
+                        if (window.showNotification) {
+                            window.showNotification('Автоматический поиск вопросов включен', 'success');
+                        }
+                    } else {
+                        if (window.showNotification) {
+                            window.showNotification('Автоматический поиск вопросов отключен', 'info');
+                        }
+                    }
+                });
+                
+                // Включаем автопоиск сразу при загрузке страницы
+                toggleAutoSearch(true);
+                toggleAutoBtn.innerHTML = '<i class="fas fa-search"></i> Авто-поиск ВКЛ';
+                toggleAutoBtn.className = 'debug-btn primary';
+            }
+            
+            // Обновить отладочную информацию
+            function updateDebugInfo() {
+                try {
+                    // Обновляем данные в отладочной панели, если она существует
+                    const debugElements = {
+                        localStorage: document.getElementById('debug-localStorage'),
+                        statsModule: document.getElementById('debug-statsModule'),
+                        adminStats: document.getElementById('debug-adminStats'),
+                        ui: document.getElementById('debug-ui')
+                    };
+                    
+                    // Информация из localStorage
+                    if (debugElements.localStorage) {
+                        const savedStats = localStorage.getItem('appStats');
+                        debugElements.localStorage.textContent = savedStats ? JSON.stringify(JSON.parse(savedStats), null, 2) : 'Нет данных';
+                    }
+                    
+                    // Информация из statsModule
+                    if (debugElements.statsModule) {
+                        const moduleStats = window.statsModule?.getStats ? window.statsModule.getStats() : 'Модуль не доступен';
+                        debugElements.statsModule.textContent = JSON.stringify(moduleStats, null, 2);
+                    }
+                    
+                    // Информация из adminStats
+                    if (debugElements.adminStats) {
+                        debugElements.adminStats.textContent = JSON.stringify(window.adminStats || 'Отсутствует', null, 2);
+                    }
+                    
+                    // Информация об UI элементах
+                    if (debugElements.ui) {
+                        const uiValues = {
+                            totalUsers: document.getElementById('total-users')?.textContent || 'Не найден',
+                            totalPredictions: document.getElementById('total-predictions')?.textContent || 'Не найден',
+                            todayPredictions: document.getElementById('today-predictions')?.textContent || 'Не найден',
+                            totalShares: document.getElementById('total-shares')?.textContent || 'Не найден'
+                        };
+                        debugElements.ui.textContent = JSON.stringify(uiValues, null, 2);
+                    }
+                } catch (e) {
+                    console.error('Ошибка при обновлении отладочной информации:', e);
+                }
+            }
+            
+            // Кнопки управления
+            document.getElementById('debug-refresh').addEventListener('click', function() {
+                // Сначала обновляем статистику на дашборде через refreshStats
+                if (typeof refreshStats === 'function') {
+                    refreshStats();
+                    console.log('Вызвана функция refreshStats для обновления дашборда');
+                } else {
+                    console.warn('Функция refreshStats не найдена');
+                    // Определяем функцию refreshStats для кнопки отладки
+                    window.refreshStats = function() {
+                        console.log('------- Запуск refreshStats из отладочной панели -------');
+                        
+                        // Загружаем свежие данные из localStorage
+                        const savedStats = localStorage.getItem('appStats');
+                        if (savedStats) {
+                            try {
+                                const parsedStats = JSON.parse(savedStats);
+                                
+                                // Обновляем объект adminStats значениями из хранилища
+                                if (window.adminStats) {
+                                    Object.assign(window.adminStats, parsedStats);
+                                } else {
+                                    window.adminStats = parsedStats;
+                                }
+                                
+                                // Обновляем UI
+                                const elements = {
+                                    totalUsers: document.getElementById('total-users'),
+                                    totalPredictions: document.getElementById('total-predictions'),
+                                    todayPredictions: document.getElementById('today-predictions'),
+                                    totalShares: document.getElementById('total-shares')
+                                };
+                                
+                                if (elements.totalUsers) elements.totalUsers.textContent = window.adminStats.totalUsers;
+                                if (elements.totalPredictions) elements.totalPredictions.textContent = window.adminStats.totalPredictions;
+                                if (elements.todayPredictions) elements.todayPredictions.textContent = window.adminStats.todayPredictions;
+                                if (elements.totalShares) elements.totalShares.textContent = window.adminStats.shares;
+                                
+                                console.log('Статистика успешно обновлена из localStorage:', window.adminStats);
+                                return true;
+                            } catch (e) {
+                                console.error('Ошибка при загрузке статистики из localStorage:', e);
+                            }
+                        } else {
+                            console.warn('Данные статистики не найдены в localStorage');
+                        }
+                        
+                        return false;
+                    };
+                    
+                    // Вызываем определенную функцию
+                    window.refreshStats();
+                }
+                
+                // Затем обновляем отладочную информацию
+                updateDebugInfo();
+            });
+            
+            document.getElementById('debug-test').addEventListener('click', function() {
+                // Увеличиваем счетчики для тестирования
+                if (window.statsModule && window.statsModule.registerPrediction) {
+                    window.statsModule.registerPrediction();
+                    console.log('Зарегистрировано тестовое предсказание');
+                    
+                    // Получаем обновленную статистику
+                    const updatedStats = window.statsModule.getStats();
+                    
+                    // Обновляем объект adminStats, если он существует
+                    if (window.adminStats) {
+                        Object.assign(window.adminStats, updatedStats);
+                    } else {
+                        window.adminStats = { ...updatedStats };
+                    }
+                    
+                    // Принудительно сохраняем в localStorage
+                    if (typeof window.statsModule.saveStats === 'function') {
+                        window.statsModule.saveStats();
+                    }
+                    
+                    // Обновляем UI вручную
+                    if (typeof refreshStats === 'function') {
+                        refreshStats();
+                    } else {
+                        const elements = {
+                            totalPredictions: document.getElementById('total-predictions'),
+                            todayPredictions: document.getElementById('today-predictions'),
+                            totalShares: document.getElementById('total-shares')
+                        };
+                        
+                        if (elements.totalPredictions) {
+                            elements.totalPredictions.textContent = updatedStats.totalPredictions;
+                            console.log('UI обновлен напрямую: totalPredictions =', updatedStats.totalPredictions);
+                        }
+                        
+                        if (elements.todayPredictions) {
+                            elements.todayPredictions.textContent = updatedStats.todayPredictions;
+                            console.log('UI обновлен напрямую: todayPredictions =', updatedStats.todayPredictions);
+                        }
+                    }
+                    
+                    updateDebugInfo();
+                } else {
+                    console.warn('Модуль статистики недоступен');
+                }
+            });
+            
+            document.getElementById('debug-reset').addEventListener('click', function() {
+                // Сбрасываем статистику в 0
+                if (window.statsModule) {
+                    // Создаем пустую статистику
+                    const emptyStats = {
+                        totalUsers: 0,
+                        totalPredictions: 0,
+                        todayPredictions: 0,
+                        shares: 0,
+                        lastUpdate: new Date().toISOString()
+                    };
+                    
+                    // Сохраняем её в localStorage
+                    localStorage.setItem('appStats', JSON.stringify(emptyStats));
+                    
+                    // Обновляем данные в модуле статистики
+                    if (window.statsModule.loadStats) {
+                        window.statsModule.loadStats();
+                    }
+                    
+                    console.log('Статистика сброшена до нуля:', emptyStats);
+                    
+                    // Обновляем объект adminStats
+                    if (window.adminStats) {
+                        Object.assign(window.adminStats, emptyStats);
+                    } else {
+                        window.adminStats = { ...emptyStats };
+                    }
+                    
+                    // Обновляем UI и отладочную информацию
+                    if (typeof refreshStats === 'function') {
+                        refreshStats();
+                    } else {
+                        // Обновляем UI вручную
+                        const elements = {
+                            totalUsers: document.getElementById('total-users'),
+                            totalPredictions: document.getElementById('total-predictions'),
+                            todayPredictions: document.getElementById('today-predictions'),
+                            totalShares: document.getElementById('total-shares')
+                        };
+                        
+                        if (elements.totalUsers) elements.totalUsers.textContent = "0";
+                        if (elements.totalPredictions) elements.totalPredictions.textContent = "0";
+                        if (elements.todayPredictions) elements.todayPredictions.textContent = "0";
+                        if (elements.totalShares) elements.totalShares.textContent = "0";
+                    }
+                    
+                    // Синхронизируем данные обратно в statsModule
+                    if (window.statsModule) {
+                        // Принудительно обновляем в statsModule
+                        const stats = window.statsModule.getStats();
+                        Object.assign(stats, emptyStats);
+                        
+                        // И также записываем в localStorage через функцию модуля
+                        if (typeof window.statsModule.saveStats === 'function') {
+                            window.statsModule.saveStats();
+                        }
+                    }
+                    
+                    updateDebugInfo();
+                    console.log('Статистика успешно сброшена и обновлена');
+                }
+            });
+            
+            // Обработчики кнопок управления пользователями
+            document.getElementById('reset-users').addEventListener('click', function() {
+                if (window.statsModule && typeof window.statsModule.resetUserStats === 'function') {
+                    // Сбрасываем счетчик пользователей
+                    window.statsModule.resetUserStats();
+                    console.log('Счетчик пользователей сброшен');
+                    
+                    // Обновляем UI
+                    if (typeof refreshStats === 'function') {
+                        refreshStats();
+                    }
+                    
+                    // Обновляем отладочную информацию
+                    updateDebugInfo();
+                    
+                    // Показываем уведомление
+                    if (typeof showNotification === 'function') {
+                        showNotification('Счетчик пользователей сброшен до нуля', 'success');
+                    }
+                } else {
+                    console.warn('Функция resetUserStats недоступна');
+                    if (typeof showNotification === 'function') {
+                        showNotification('Ошибка: функция сброса пользователей недоступна', 'error');
+                    }
+                }
+            });
+            
+            document.getElementById('register-user').addEventListener('click', function() {
+                if (window.statsModule && typeof window.statsModule.registerUserVisit === 'function') {
+                    // Сначала удаляем ключ сессии, чтобы форсировать регистрацию
+                    sessionStorage.removeItem('mts_design_cards_user_session');
+                    
+                    // Для тестирования создаем нового пользователя, удаляя старый ключ
+                    localStorage.removeItem('mts_design_cards_unique_user_id');
+                    
+                    // Регистрируем нового пользователя
+                    const result = window.statsModule.registerUserVisit();
+                    console.log('Результат регистрации пользователя:', result);
+                    
+                    // Обновляем UI
+                    if (typeof refreshStats === 'function') {
+                        refreshStats();
+                    }
+                    
+                    // Обновляем отладочную информацию
+                    updateDebugInfo();
+                    
+                    // Показываем уведомление
+                    if (typeof showNotification === 'function') {
+                        showNotification(result 
+                            ? 'Новый пользователь успешно зарегистрирован' 
+                            : 'Пользователь уже был зарегистрирован ранее', 
+                            result ? 'success' : 'info');
+                    }
+                } else {
+                    console.warn('Функция registerUserVisit недоступна');
+                    if (typeof showNotification === 'function') {
+                        showNotification('Ошибка: функция регистрации пользователей недоступна', 'error');
+                    }
+                }
+            });
+            
+            // Добавляем обработчик для кнопки пересчета пользователей
+            document.getElementById('recount-users').addEventListener('click', function() {
+                if (window.statsModule && typeof window.statsModule.countRegisteredUsers === 'function') {
+                    // Вызываем пересчет количества пользователей
+                    try {
+                        const userCount = window.statsModule.countRegisteredUsers();
+                        console.log('Пересчет пользователей выполнен, количество:', userCount);
+                        
+                        // Обновляем UI
+                        if (typeof refreshStats === 'function') {
+                            refreshStats();
+                        }
+                        
+                        // Обновляем отладочную информацию
+                        updateDebugInfo();
+                        
+                        // Показываем уведомление
+                        if (typeof showNotification === 'function') {
+                            showNotification(`Пересчет пользователей выполнен успешно. Текущее количество: ${userCount}`, 'success');
+                        }
+                    } catch (error) {
+                        console.error('Ошибка при пересчете пользователей:', error);
+                        if (typeof showNotification === 'function') {
+                            showNotification('Ошибка при пересчете пользователей', 'error');
+                        }
+                    }
+                } else {
+                    console.warn('Функция countRegisteredUsers недоступна');
+                    if (typeof showNotification === 'function') {
+                        showNotification('Ошибка: функция пересчета пользователей недоступна', 'error');
+                    }
+                }
+            });
+            
+            // Вызываем updateDebugInfo один раз при инициализации
+            updateDebugInfo();
+            
+            // Обработчик для новой кнопки сброса всех данных
+            const resetAllDataBtn = document.getElementById('reset-all-data');
+            if (resetAllDataBtn) {
+                resetAllDataBtn.addEventListener('click', function() {
+                    if (confirm('Вы действительно хотите сбросить ВСЕ данные приложения? Это действие невозможно отменить.')) {
+                        // Очищаем localStorage полностью
+                        localStorage.clear();
+                        console.log('Все данные в localStorage удалены');
+                        
+                        // Очищаем sessionStorage
+                        sessionStorage.clear();
+                        console.log('Все данные в sessionStorage удалены');
+                        
+                        // Сбрасываем статистику
+                        if (window.statsModule && typeof window.statsModule.resetAllStats === 'function') {
+                            window.statsModule.resetAllStats();
+                        }
+                        
+                        // Обновляем интерфейс
+                        if (window.refreshStats) {
+                            window.refreshStats();
+                        }
+                        
+                        // Обновляем отладочную информацию
+                        if (typeof updateDebugInfo === 'function') {
+                            updateDebugInfo();
+                        }
+                        
+                        // Уведомляем пользователя
+                        if (typeof showNotification === 'function') {
+                            showNotification('Все данные приложения сброшены', 'warning');
+                        } else {
+                            alert('Все данные приложения сброшены. Страница будет перезагружена.');
+                            // Перезагружаем страницу
+                            setTimeout(() => location.reload(), 1500);
+                        }
+                    }
+                });
+            }
+            
+            // Настройка кнопки автообновления
+            const autoRefreshBtn = document.getElementById('auto-refresh-toggle');
+            if (autoRefreshBtn) {
+                // Устанавливаем начальное состояние
+                autoRefreshBtn.setAttribute('data-active', 'true');
+                
+                autoRefreshBtn.addEventListener('click', function() {
+                    const isActive = this.getAttribute('data-active') === 'true';
+                    const newState = !isActive;
+                    
+                    if (window.toggleAutoRefresh) {
+                        window.toggleAutoRefresh(newState);
+                    }
+                    
+                    this.setAttribute('data-active', newState);
+                    this.innerHTML = newState ? 
+                        '<i class="fas fa-clock"></i> Автообновление ВКЛ' : 
+                        '<i class="fas fa-clock-slash"></i> Автообновление ВЫКЛ';
+                    this.className = newState ? 
+                        'btn btn-sm btn-primary' : 
+                        'btn btn-sm btn-secondary';
+                    
+                    if (typeof showNotification === 'function') {
+                        showNotification('Автообновление ' + (newState ? 'включено' : 'выключено'), 'info');
+                    }
+                });
+            }
+        });
+    </script>
+
+    <!-- Модальное окно для расширенного управления API -->
+    <div class="modal" id="api-management-modal">
+        <div class="modal-content" style="max-width: 800px; width: 95%;">
+            <div class="modal-header">
+                <h3><i class="fas fa-robot"></i> Управление API</h3>
+                <button class="close-modal btn btn-icon" id="close-api-modal" aria-label="Закрыть окно API">&times;</button>
+            </div>
+            
+            <div class="debug-tabs" style="display:flex; margin-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;">
+                <button class="api-tab active" data-tab="settings" aria-label="Показать вкладку настроек">Настройки</button>
+                <button class="api-tab" data-tab="statistics" aria-label="Показать вкладку статистики">Статистика</button>
+                <button class="api-tab" data-tab="test" aria-label="Показать вкладку тестирования">Тестирование</button>
+                <button class="api-tab" data-tab="qr-codes" aria-label="Показать вкладку QR-кодов">QR-коды</button>
+            </div>
+            
+            <!-- Вкладка настроек -->
+            <div id="api-tab-settings" class="api-tab-content active">
+                <form id="api-settings-form">
+                    <div class="form-group">
+                        <label for="api-key">API-ключ OpenAI:</label>
+                        <div style="display: flex;">
+                            <input type="password" id="api-key" class="form-control" placeholder="sk-..." style="flex-grow: 1;">
+                            <button type="button" id="toggle-api-key" class="btn btn-secondary" style="margin-left: 10px; white-space: nowrap;">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button type="button" id="delete-api-key" class="btn btn-danger" style="margin-left: 10px; white-space: nowrap;">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                        <small style="color: var(--dark-gray); margin-top: 5px; display: block;">Ключ хранится только локально в вашем браузере и не передается на сервер.</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="switch-label">
+                            <span>Включить генерацию через API:</span>
+                            <div class="switch">
+                                <input type="checkbox" id="api-enabled">
+                                <span class="slider"></span>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="api-model">Модель:</label>
+                        <select id="api-model" class="form-control">
+                            <option value="gpt-4">GPT-4 (наиболее мощная)</option>
+                            <option value="gpt-4-turbo">GPT-4 Turbo (быстрее)</option>
+                            <option value="gpt-3.5-turbo">GPT-3.5 Turbo (экономичнее)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="api-temperature">Температура (случайность):</label>
+                        <input type="range" id="api-temperature" min="0" max="1" step="0.1" class="form-control">
+                        <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                            <small style="color: var(--dark-gray);">Точные ответы (0.0)</small>
+                            <small id="temperature-value" style="color: var(--primary-color);"></small>
+                            <small style="color: var(--dark-gray);">Творческие ответы (1.0)</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="api-system-prompt">Системный промт:</label>
+                        <textarea id="api-system-prompt" class="form-control" rows="6" placeholder="Инструкция для модели"></textarea>
+                        <small style="color: var(--dark-gray); margin-top: 5px; display: block;">
+                            Используйте ${cardTitle} и ${question} как переменные, которые будут заменены на реальные данные.
+                        </small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Сохранить настройки</button>
+                </form>
+            </div>
+            
+            <!-- Вкладка статистики -->
+            <div id="api-tab-statistics" class="api-tab-content" style="display: none;">
+                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 25px;">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-exchange-alt"></i></div>
+                        <div class="stat-value" id="api-total-requests">0</div>
+                        <div class="stat-label">Всего запросов</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-value" id="api-success-rate">0%</div>
+                        <div class="stat-label">Успешных запросов</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-coins"></i></div>
+                        <div class="stat-value" id="api-total-tokens">0</div>
+                        <div class="stat-label">Всего токенов</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label><strong>История запросов:</strong></label>
+                    <div id="api-history-container" style="max-height: 350px; overflow-y: auto; background-color: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 15px; margin-top: 10px;">
+                        <!-- Здесь будет отображаться история запросов -->
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 15px; margin-top: 20px;">
+                    <button id="refresh-api-stats" class="btn btn-secondary"><i class="fas fa-sync-alt"></i> Обновить статистику</button>
+                    <button id="reset-api-stats" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Сбросить статистику</button>
+                </div>
+            </div>
+            
+            <!-- Вкладка тестирования -->
+            <div id="api-tab-test" class="api-tab-content" style="display: none;">
+                <form id="api-test-form">
+                    <div class="form-group">
+                        <label for="test-card-title">Название карты:</label>
+                        <input type="text" id="test-card-title" class="form-control" value="Тестовая карта" placeholder="Введите название карты">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="test-card-description">Описание карты:</label>
+                        <textarea id="test-card-description" class="form-control" rows="3" placeholder="Описание карты (опционально)"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="test-question">Тестовый вопрос:</label>
+                        <textarea id="test-question" class="form-control" rows="2" placeholder="Введите вопрос для тестирования"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" id="run-api-test"><i class="fas fa-play-circle"></i> Запустить тест</button>
+                </form>
+                
+                <div class="form-group" style="margin-top: 25px;">
+                    <label><strong>Результат:</strong></label>
+                    <div id="api-test-result" style="background-color: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 15px; margin-top: 10px; min-height: 100px; max-height: 300px; overflow-y: auto;">
+                        <p style="color: var(--dark-gray); text-align: center; font-style: italic;">Результаты тестирования будут отображены здесь</p>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <small style="color: var(--dark-gray); display: block;">
+                        <i class="fas fa-info-circle"></i> Тестовые запросы также учитываются в общей статистике и расходуют токены.
+                    </small>
+                </div>
+            </div>
+            
+            <!-- Вкладка QR-кодов -->
+            <div id="api-tab-qr-codes" class="api-tab-content" style="display: none;">
+                <div class="form-group">
+                    <h4>Настройка данных QR-кодов</h4>
+                    <p style="color: var(--dark-gray); margin-bottom: 20px;">
+                        Здесь вы можете настроить соответствие QR-кодов картам. Эти настройки будут использоваться на всех устройствах через синхронизацию.
+                    </p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="qr-prefix">Префикс QR-кодов:</label>
+                    <input type="text" id="qr-prefix" class="form-control" value="design" placeholder="Префикс для QR-кодов (например, design)">
+                    <small style="color: var(--dark-gray); margin-top: 5px; display: block;">
+                        QR-коды будут иметь формат [префикс][номер]. Например, design001.
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="card-prefix">Префикс карт:</label>
+                    <input type="text" id="card-prefix" class="form-control" value="card" placeholder="Префикс для карт (например, card)">
+                    <small style="color: var(--dark-gray); margin-top: 5px; display: block;">
+                        Карты имеют формат [префикс][номер]. Например, card001.
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="qr-to-card-mapping">Пользовательские соответствия QR-кодов картам:</label>
+                    <div id="qr-mappings-container" style="max-height: 200px; overflow-y: auto; background-color: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 15px; margin-top: 10px;">
+                        <!-- Здесь будут отображаться пользовательские соответствия -->
+                        <div class="empty-message" style="text-align: center; color: var(--dark-gray); font-style: italic;">
+                            Соответствия QR-кодов картам не найдены
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-top: 20px;">
+                    <h4>Добавить новое соответствие</h4>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <input type="text" id="new-qr-code" class="form-control" placeholder="QR-код (например, design099)" style="flex: 1;">
+                        <input type="text" id="new-card-key" class="form-control" placeholder="Ключ карты (например, card099)" style="flex: 1;">
+                        <button id="add-qr-mapping" class="btn btn-primary" style="white-space: nowrap;">
+                            <i class="fas fa-plus"></i> Добавить
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 15px; margin-top: 20px;">
+                    <button id="save-qr-config" class="btn btn-primary"><i class="fas fa-save"></i> Сохранить настройки</button>
+                    <button id="reset-qr-mappings" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Сбросить соответствия</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Добавляем скрипт для управления API -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Настройка модального окна для API
+            setupApiModal();
+            
+            // Привязка кнопки к открытию модального окна
+            const gptSettingsBtn = document.getElementById('gpt-settings-btn');
+            if (gptSettingsBtn) {
+                gptSettingsBtn.addEventListener('click', openApiModal);
+            }
+        });
+        
+        // Функция для настройки модального окна API
+        function setupApiModal() {
+            // Получаем ссылки на элементы
+            const modal = document.getElementById('api-management-modal');
+            const closeBtn = document.getElementById('close-api-modal');
+            const apiTab = document.querySelectorAll('.api-tab');
+            const tabContents = document.querySelectorAll('.api-tab-content');
+            
+            // Настройка переключения вкладок
+            apiTab.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Удаляем активный класс у всех вкладок
+                    apiTab.forEach(t => t.classList.remove('active'));
+                    // Добавляем активный класс текущей вкладке
+                    this.classList.add('active');
+                    
+                    // Скрываем все содержимое вкладок
+                    tabContents.forEach(content => content.style.display = 'none');
+                    
+                    // Показываем содержимое выбранной вкладки
+                    const tabName = this.getAttribute('data-tab');
+                    document.getElementById('api-tab-' + tabName).style.display = 'block';
+                    
+                    // Обновляем содержимое вкладки, если необходимо
+                    if (tabName === 'statistics') {
+                        updateApiStats();
+                    } else if (tabName === 'qr-codes') {
+                        loadQrSettings();
+                    }
+                });
+            });
+            
+            // Настройка закрытия модального окна
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function() {
+                    modal.style.display = 'none';
+                });
+            }
+            
+            // Закрытие при клике вне модального окна
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            // Настройка формы настроек API
+            setupApiSettingsForm();
+            
+            // Настройка вкладки статистики
+            setupApiStatsTab();
+            
+            // Настройка вкладки тестирования
+            setupApiTestTab();
+            
+            // Настройка вкладки QR-кодов
+            setupQrCodesTab();
+            
+            // Настройка переключателя видимости API-ключа
+            const toggleApiKeyBtn = document.getElementById('toggle-api-key');
+            const apiKeyInput = document.getElementById('api-key');
+            
+            if (toggleApiKeyBtn && apiKeyInput) {
+                toggleApiKeyBtn.addEventListener('click', function() {
+                    const type = apiKeyInput.getAttribute('type');
+                    apiKeyInput.setAttribute('type', type === 'password' ? 'text' : 'password');
+                    toggleApiKeyBtn.innerHTML = type === 'password' ? 
+                        '<i class="fas fa-eye-slash"></i>' : 
+                        '<i class="fas fa-eye"></i>';
+                });
+            }
+            
+            // Настройка кнопки удаления API-ключа
+            const deleteApiKeyBtn = document.getElementById('delete-api-key');
+            if (deleteApiKeyBtn && apiKeyInput) {
+                deleteApiKeyBtn.addEventListener('click', function() {
+                    if (confirm('Вы уверены, что хотите удалить API ключ? Это действие нельзя отменить.')) {
+                        // Очищаем поле ввода
+                        apiKeyInput.value = '';
+                        
+                        // Обновляем настройки в модуле API
+                        if (window.apiModule && typeof window.apiModule.updateSettings === 'function') {
+                            window.apiModule.updateSettings({
+                                apiKey: ''
+                            });
+                            
+                            // Также отключаем API, если был удален ключ
+                            const apiEnabledCheckbox = document.getElementById('api-enabled');
+                            if (apiEnabledCheckbox) {
+                                apiEnabledCheckbox.checked = false;
+                                window.apiModule.updateSettings({
+                                    isEnabled: false
+                                });
+                            }
+                            
+                            showNotification('API ключ успешно удален', 'success');
+                        } else {
+                            // Если модуль недоступен, просто удаляем ключ из localStorage
+                            localStorage.removeItem('gptApiKey');
+                            localStorage.setItem('isGptEnabled', 'false');
+                            showNotification('API ключ удален, но модуль API недоступен', 'warning');
+                        }
+                    }
+                });
+            }
+            
+            // Настройка слайдера температуры
+            const temperatureSlider = document.getElementById('api-temperature');
+            const temperatureValue = document.getElementById('temperature-value');
+            
+            if (temperatureSlider && temperatureValue) {
+                temperatureSlider.addEventListener('input', function() {
+                    temperatureValue.textContent = this.value;
+                });
+            }
+        }
+        
+        // Настройка вкладки QR-кодов
+        function setupQrCodesTab() {
+            // Получаем элементы
+            const qrPrefixInput = document.getElementById('qr-prefix');
+            const cardPrefixInput = document.getElementById('card-prefix');
+            const qrMappingsContainer = document.getElementById('qr-mappings-container');
+            const newQrCodeInput = document.getElementById('new-qr-code');
+            const newCardKeyInput = document.getElementById('new-card-key');
+            const addQrMappingBtn = document.getElementById('add-qr-mapping');
+            const saveQrConfigBtn = document.getElementById('save-qr-config');
+            const resetQrMappingsBtn = document.getElementById('reset-qr-mappings');
+            
+            // Проверяем наличие необходимых элементов
+            if (!qrPrefixInput || !cardPrefixInput || !qrMappingsContainer || !addQrMappingBtn || !saveQrConfigBtn || !resetQrMappingsBtn) {
+                console.error('Не найдены необходимые элементы для настройки вкладки QR-кодов');
+                return;
+            }
+            
+            // Обработчик добавления нового QR-маппинга
+            addQrMappingBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const qrCode = newQrCodeInput.value.trim();
+                const cardKey = newCardKeyInput.value.trim();
+                
+                if (!qrCode || !cardKey) {
+                    showNotification('Пожалуйста, заполните оба поля', 'warning');
+                    return;
+                }
+                
+                // Проверяем, доступен ли API модуль
+                if (!window.apiModule || !window.apiModule.updateQrMapping) {
+                    showNotification('Модуль API не доступен', 'error');
+                    return;
+                }
+                
+                // Добавляем новый маппинг
+                if (window.apiModule.updateQrMapping(qrCode, cardKey)) {
+                    showNotification(`Соответствие ${qrCode} -> ${cardKey} добавлено`, 'success');
+                    
+                    // Очищаем поля ввода
+                    newQrCodeInput.value = '';
+                    newCardKeyInput.value = '';
+                    
+                    // Обновляем отображение маппингов
+                    loadQrMappings();
+                } else {
+                    showNotification('Ошибка при добавлении соответствия', 'error');
+                }
+            });
+            
+            // Обработчик сохранения конфигурации QR-кодов
+            saveQrConfigBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const qrPrefix = qrPrefixInput.value.trim();
+                const cardPrefix = cardPrefixInput.value.trim();
+                
+                if (!qrPrefix || !cardPrefix) {
+                    showNotification('Пожалуйста, заполните оба префикса', 'warning');
+                    return;
+                }
+                
+                // Проверяем, доступен ли API модуль
+                if (!window.apiModule || !window.apiModule.updateQrConfig) {
+                    showNotification('Модуль API не доступен', 'error');
+                    return;
+                }
+                
+                // Обновляем конфигурацию
+                const config = window.apiModule.updateQrConfig({
+                    qrPrefix: qrPrefix,
+                    cardPrefix: cardPrefix
+                });
+                
+                if (config) {
+                    showNotification('Настройки QR-кодов сохранены', 'success');
+                } else {
+                    showNotification('Ошибка при сохранении настроек QR-кодов', 'error');
+                }
+            });
+            
+            // Обработчик сброса QR-маппингов
+            resetQrMappingsBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                if (confirm('Вы уверены, что хотите сбросить все соответствия QR-кодов? Это действие нельзя отменить.')) {
+                    // Проверяем, доступен ли API модуль
+                    if (!window.apiModule || !window.apiModule.clearQrMappings) {
+                        showNotification('Модуль API не доступен', 'error');
+                        return;
+                    }
+                    
+                    // Сбрасываем маппинги
+                    if (window.apiModule.clearQrMappings()) {
+                        showNotification('Все соответствия QR-кодов сброшены', 'success');
+                        
+                        // Обновляем отображение маппингов
+                        loadQrMappings();
+                    } else {
+                        showNotification('Ошибка при сбросе соответствий QR-кодов', 'error');
+                    }
+                }
+            });
+        }
+        
+        // Загрузка настроек QR-кодов
+        function loadQrSettings() {
+            // Проверяем, доступен ли API модуль
+            if (!window.apiModule) {
+                console.error('Модуль API не доступен');
+                return;
+            }
+            
+            // Загружаем конфигурацию
+            const config = window.apiModule.loadQrConfig() || {};
+            
+            // Заполняем поля ввода
+            const qrPrefixInput = document.getElementById('qr-prefix');
+            const cardPrefixInput = document.getElementById('card-prefix');
+            
+            if (qrPrefixInput && config.qrPrefix) {
+                qrPrefixInput.value = config.qrPrefix;
+            }
+            
+            if (cardPrefixInput && config.cardPrefix) {
+                cardPrefixInput.value = config.cardPrefix;
+            }
+            
+            // Загружаем маппинги
+            loadQrMappings();
+        }
+        
+        // Загрузка и отображение QR-маппингов
+        function loadQrMappings() {
+            // Проверяем, доступен ли API модуль
+            if (!window.apiModule || !window.apiModule.getQrMappings) {
+                console.error('Модуль API не доступен');
+                return;
+            }
+            
+            // Получаем контейнер для маппингов
+            const qrMappingsContainer = document.getElementById('qr-mappings-container');
+            if (!qrMappingsContainer) {
+                console.error('Контейнер для QR-маппингов не найден');
+                return;
+            }
+            
+            // Загружаем маппинги
+            const mappings = window.apiModule.getQrMappings() || {};
+            const mappingKeys = Object.keys(mappings);
+            
+            // Очищаем контейнер
+            qrMappingsContainer.innerHTML = '';
+            
+            // Если маппингов нет, показываем сообщение
+            if (mappingKeys.length === 0) {
+                qrMappingsContainer.innerHTML = `
+                    <div class="empty-message" style="text-align: center; color: var(--dark-gray); font-style: italic;">
+                        Соответствия QR-кодов картам не найдены
+                    </div>
+                `;
+                return;
+            }
+            
+            // Создаем элементы для каждого маппинга
+            mappingKeys.forEach(qrCode => {
+                const cardKey = mappings[qrCode];
+                
+                const mappingItem = document.createElement('div');
+                mappingItem.className = 'mapping-item';
+                mappingItem.style.display = 'flex';
+                mappingItem.style.justifyContent = 'space-between';
+                mappingItem.style.alignItems = 'center';
+                mappingItem.style.marginBottom = '10px';
+                mappingItem.style.padding = '10px';
+                mappingItem.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                mappingItem.style.borderRadius = '8px';
+                
+                mappingItem.innerHTML = `
+                    <div>
+                        <strong>${qrCode}</strong> → <span>${cardKey}</span>
+                    </div>
+                    <button class="btn btn-danger btn-sm remove-mapping" data-qr="${qrCode}" style="padding: 5px 10px;" aria-label="Удалить соответствие">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                `;
+                
+                qrMappingsContainer.appendChild(mappingItem);
+                
+                // Добавляем обработчик удаления маппинга
+                const removeBtn = mappingItem.querySelector('.remove-mapping');
+                if (removeBtn) {
+                    removeBtn.addEventListener('click', function() {
+                        const qrToRemove = this.getAttribute('data-qr');
+                        
+                        // Проверяем, доступен ли API модуль
+                        if (!window.apiModule || !window.apiModule.removeQrMapping) {
+                            showNotification('Модуль API не доступен', 'error');
+                            return;
+                        }
+                        
+                        // Удаляем маппинг
+                        if (window.apiModule.removeQrMapping(qrToRemove)) {
+                            showNotification(`Соответствие для ${qrToRemove} удалено`, 'success');
+                            
+                            // Обновляем отображение маппингов
+                            loadQrMappings();
+                        } else {
+                            showNotification('Ошибка при удалении соответствия', 'error');
+                        }
+                    });
+                }
+            });
+        }
+        
+        // Функция открытия модального окна API
+        function openApiModal() {
+            const modal = document.getElementById('api-management-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                loadApiSettings();
+            }
+        }
+        
+        // Загрузка настроек API
+        function loadApiSettings() {
+            if (!window.apiModule) {
+                console.warn('Модуль API не загружен');
+                showNotification('Модуль API не загружен', 'error');
+                return;
+            }
+            
+            try {
+                const settings = window.apiModule.getSettings();
+                
+                // Заполняем форму настроек
+                document.getElementById('api-enabled').checked = settings.isEnabled;
+                document.getElementById('api-model').value = settings.model;
+                document.getElementById('api-temperature').value = settings.temperature;
+                document.getElementById('temperature-value').textContent = settings.temperature;
+                document.getElementById('api-system-prompt').value = settings.systemPromptTemplate;
+                
+                // Проверяем наличие ключа API
+                if (settings.hasApiKey) {
+                    // Получаем ключ напрямую из localStorage для отображения
+                    const apiKey = localStorage.getItem('gptApiKey') || '';
+                    document.getElementById('api-key').value = apiKey;
+                    console.log('Загружен API ключ, длина:', apiKey.length);
+                } else {
+                    document.getElementById('api-key').value = '';
+                    console.log('API ключ не найден в настройках');
+                }
+                
+                console.log('Настройки API загружены:', 
+                    { enabled: settings.isEnabled, model: settings.model, hasKey: settings.hasApiKey });
+            } catch (error) {
+                console.error('Ошибка при загрузке настроек API:', error);
+                showNotification('Ошибка при загрузке настроек API', 'error');
+            }
+        }
+        
+        // Настройка формы настроек API
+        function setupApiSettingsForm() {
+            const form = document.getElementById('api-settings-form');
+            const apiKeyInput = document.getElementById('api-key');
+            const apiEnabledCheckbox = document.getElementById('api-enabled');
+            const apiModelSelect = document.getElementById('api-model');
+            const apiTemperatureInput = document.getElementById('api-temperature');
+            const apiSystemPromptInput = document.getElementById('api-system-prompt');
+            const temperatureValueDisplay = document.getElementById('temperature-value');
+            
+            // Загружаем значения из модуля API при первом открытии
+            function loadApiSettings() {
+                if (window.apiModule && typeof window.apiModule.getSettings === 'function') {
+                    const settings = window.apiModule.getSettings();
+                    console.log('Загружены настройки из API модуля:', settings);
+                    
+                    // Устанавливаем галочку включения API
+                    if (apiEnabledCheckbox) {
+                        apiEnabledCheckbox.checked = settings.isEnabled;
+                    }
+                    
+                    // Устанавливаем модель
+                    if (apiModelSelect && settings.model) {
+                        const modelOption = Array.from(apiModelSelect.options).find(opt => opt.value === settings.model);
+                        if (modelOption) {
+                            apiModelSelect.value = settings.model;
+                        } else {
+                            console.warn('Модель из API модуля не найдена в списке:', settings.model);
+                        }
+                    }
+                    
+                    // Устанавливаем температуру
+                    if (apiTemperatureInput && settings.temperature !== undefined) {
+                        apiTemperatureInput.value = settings.temperature;
+                        
+                        // Обновляем отображение значения температуры
+                        if (temperatureValueDisplay) {
+                            temperatureValueDisplay.textContent = settings.temperature;
+                        }
+                    }
+                    
+                    // Устанавливаем системный промпт
+                    if (apiSystemPromptInput) {
+                        const savedPrompt = localStorage.getItem('gptPrompt') || localStorage.getItem('openai_system_prompt');
+                        if (savedPrompt) {
+                            apiSystemPromptInput.value = savedPrompt;
+                            console.log('Загружен сохраненный системный промпт для формы, длина:', savedPrompt.length);
+                        } else {
+                            console.log('Системный промпт не найден в localStorage, используется значение по умолчанию');
+                        }
+                    }
+                    
+                    // Загружаем API ключ (хранится отдельно от настроек по соображениям безопасности)
+                    if (apiKeyInput) {
+                        // Проверяем оба возможных места хранения ключа
+                        const apiKey = localStorage.getItem('gptApiKey') || localStorage.getItem('openai_api_key') || '';
+                        apiKeyInput.value = apiKey;
+                    }
+                } else {
+                    console.warn('API модуль не найден или не инициализирован, используем настройки из localStorage');
+                    
+                    // Загружаем настройки напрямую из localStorage
+                    if (apiEnabledCheckbox) {
+                        apiEnabledCheckbox.checked = localStorage.getItem('isGptEnabled') === 'true' || 
+                                                   localStorage.getItem('openai_api_enabled') === 'true';
+                    }
+                    
+                    if (apiModelSelect) {
+                        const savedModel = localStorage.getItem('gptModel');
+                        if (savedModel) {
+                            apiModelSelect.value = savedModel;
+                        }
+                    }
+                    
+                    if (apiTemperatureInput) {
+                        const savedTemp = localStorage.getItem('gptTemperature');
+                        if (savedTemp) {
+                            apiTemperatureInput.value = savedTemp;
+                            
+                            if (temperatureValueDisplay) {
+                                temperatureValueDisplay.textContent = savedTemp;
+                            }
+                        }
+                    }
+                    
+                    if (apiSystemPromptInput) {
+                        const savedPrompt = localStorage.getItem('gptPrompt') || localStorage.getItem('openai_system_prompt');
+                        if (savedPrompt) {
+                            apiSystemPromptInput.value = savedPrompt;
+                            console.log('Загружен сохраненный системный промпт для формы, длина:', savedPrompt.length);
+                        } else {
+                            console.log('Системный промпт не найден в localStorage, используется значение по умолчанию');
+                        }
+                    }
+                    
+                    if (apiKeyInput) {
+                        const apiKey = localStorage.getItem('gptApiKey') || localStorage.getItem('openai_api_key') || '';
+                        apiKeyInput.value = apiKey;
+                    }
+                }
+            }
+            
+            // Обновление отображения значения температуры при изменении слайдера
+            if (apiTemperatureInput && temperatureValueDisplay) {
+                apiTemperatureInput.addEventListener('input', function() {
+                    temperatureValueDisplay.textContent = this.value;
+                });
+            }
+            
+            // Добавляем автоматическую проверку доступности API
+            function checkApiAvailability() {
+                // Проверяем, есть ли ключ API
+                const apiKey = apiKeyInput.value.trim();
+                const hasApiKey = apiKey.length > 0;
+                
+                // Если ключ есть, автоматически включаем API
+                if (hasApiKey && !apiEnabledCheckbox.checked) {
+                    console.log('Автоматически включаем API, так как ключ введен');
+                    apiEnabledCheckbox.checked = true;
+                }
+                
+                // Если ключа нет, автоматически отключаем API
+                if (!hasApiKey && apiEnabledCheckbox.checked) {
+                    console.log('Автоматически отключаем API, так как ключ отсутствует');
+                    apiEnabledCheckbox.checked = false;
+                }
+            }
+            
+            // Привязываем событие к полю ввода API ключа
+            if (apiKeyInput) {
+                apiKeyInput.addEventListener('input', checkApiAvailability);
+            }
+            
+            // Добавляем автоматическое сохранение при изменении галочки
+            if (apiEnabledCheckbox) {
+                apiEnabledCheckbox.addEventListener('change', function() {
+                    // Получаем текущие настройки
+                    const apiKey = apiKeyInput.value.trim();
+                    const isEnabled = apiEnabledCheckbox.checked;
+                    
+                    // Проверяем, можно ли включить API (должен быть ключ)
+                    if (isEnabled && (!apiKey || apiKey.length === 0)) {
+                        showNotification('Невозможно включить API без ключа', 'warning');
+                        // Отменяем действие
+                        apiEnabledCheckbox.checked = false;
+                        return;
+                    }
+                    
+                    // Сохраняем настройки немедленно
+                    if (window.apiModule && typeof window.apiModule.updateSettings === 'function') {
+                        const updateResult = window.apiModule.updateSettings({
+                            isEnabled: isEnabled
+                        });
+                        
+                        if (updateResult) {
+                            console.log('API ' + (isEnabled ? 'включен' : 'отключен') + ' автоматически');
+                            showNotification('API ' + (isEnabled ? 'включен' : 'отключен'), 'success');
+                        }
+                    } else {
+                        console.warn('Модуль API недоступен, настройки будут сохранены только в localStorage');
+                        localStorage.setItem('isGptEnabled', isEnabled.toString());
+                        localStorage.setItem('openai_api_enabled', isEnabled.toString());
+                        showNotification('Настройки сохранены в localStorage', 'info');
+                    }
+                });
+            }
+            
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    if (!window.apiModule) {
+                        showNotification('Модуль API не загружен', 'error');
+                        return;
+                    }
+                    
+                    try {
+                        // Собираем данные из формы
+                        const apiKey = document.getElementById('api-key').value.trim();
+                        const isEnabled = document.getElementById('api-enabled').checked;
+                        const model = document.getElementById('api-model').value;
+                        const temperature = parseFloat(document.getElementById('api-temperature').value);
+                        const systemPromptTemplate = document.getElementById('api-system-prompt').value;
+                        
+                        // Автоматически отключаем API, если ключ не указан
+                        const finalEnabled = apiKey.length > 0 ? isEnabled : false;
+                        if (finalEnabled !== isEnabled) {
+                            console.log(`API ${finalEnabled ? 'включен' : 'отключен'} автоматически исходя из наличия ключа`);
+                            document.getElementById('api-enabled').checked = finalEnabled;
+                        }
+                        
+                        // Обновляем настройки
+                        const updateResult = window.apiModule.updateSettings({
+                            apiKey,
+                            isEnabled: finalEnabled,
+                            model,
+                            temperature,
+                            systemPromptTemplate
+                        });
+                        
+                        // Дополнительно сохраняем системный промпт в localStorage для совместимости
+                        if (systemPromptTemplate) {
+                            localStorage.setItem('openai_system_prompt', systemPromptTemplate);
+                            console.log('Системный промпт дополнительно сохранен в openai_system_prompt для совместимости');
+                        }
+                        
+                        if (updateResult) {
+                            showNotification('Настройки API сохранены', 'success');
+                            console.log('Настройки API обновлены:', { 
+                                enabled: finalEnabled, 
+                                model: model, 
+                                hasKey: apiKey.length > 0,
+                                keyLength: apiKey.length,
+                                promptLength: systemPromptTemplate ? systemPromptTemplate.length : 0
+                            });
+                            
+                            // Проверяем доступность API после обновления
+                            if (window.apiModule.isApiAvailable()) {
+                                showNotification('API включен и готов к использованию', 'success');
+                            } else {
+                                console.warn('API не активен после обновления настроек');
+                                if (!finalEnabled) {
+                                    showNotification('API отключен в настройках', 'warning');
+                                } else if (!apiKey) {
+                                    showNotification('Отсутствует API ключ', 'warning');
+                                }
+                            }
+                        } else {
+                            showNotification('Ничего не было изменено', 'info');
+                        }
+                    } catch (error) {
+                        console.error('Ошибка при сохранении настроек API:', error);
+                        showNotification('Ошибка при сохранении настроек API', 'error');
+                    }
+                });
+            }
+            
+            // Загружаем настройки при инициализации
+            loadApiSettings();
+        }
+        
+        // Настройка вкладки статистики API
+        function setupApiStatsTab() {
+            // Обновление статистики при открытии вкладки
+            const statisticsTab = document.querySelector('.api-tab[data-tab="statistics"]');
+            if (statisticsTab) {
+                statisticsTab.addEventListener('click', updateApiStats);
+            }
+            
+            // Кнопка обновления статистики
+            const refreshBtn = document.getElementById('refresh-api-stats');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', updateApiStats);
+            }
+            
+            // Кнопка сброса статистики
+            const resetBtn = document.getElementById('reset-api-stats');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function() {
+                    if (!window.apiModule) {
+                        showNotification('Модуль API не загружен', 'error');
+                        return;
+                    }
+                    
+                    try {
+                        // Запрашиваем подтверждение
+                        if (confirm('Вы уверены, что хотите сбросить всю статистику API? Это действие нельзя отменить.')) {
+                            window.apiModule.resetStats();
+                            updateApiStats();
+                            showNotification('Статистика API успешно сброшена', 'success');
+                        }
+                    } catch (error) {
+                        console.error('Ошибка при сбросе статистики API:', error);
+                        showNotification('Ошибка при сбросе статистики API', 'error');
+                    }
+                });
+            }
+        }
+        
+        // Обновление статистики API
+        function updateApiStats() {
+            if (!window.apiModule) {
+                showNotification('Модуль API не загружен', 'error');
+                return;
+            }
+            
+            try {
+                const stats = window.apiModule.getStats();
+                
+                // Обновляем отображение статистики
+                document.getElementById('api-total-requests').textContent = stats.totalRequests;
+                
+                // Вычисляем процент успешных запросов
+                const successRate = stats.totalRequests > 0 ? 
+                    Math.round((stats.successfulRequests / stats.totalRequests) * 100) : 0;
+                document.getElementById('api-success-rate').textContent = `${successRate}%`;
+                
+                // Обновляем количество токенов
+                document.getElementById('api-total-tokens').textContent = stats.totalTokens;
+                
+                // Обновляем историю запросов
+                updateApiHistory(stats.history);
+                
+                console.log('Статистика API обновлена:', stats);
+            } catch (error) {
+                console.error('Ошибка при обновлении статистики API:', error);
+            }
+        }
+        
+        // Обновление истории запросов
+        function updateApiHistory(history) {
+            const historyContainer = document.getElementById('api-history-container');
+            
+            if (!historyContainer) return;
+            
+            // Очищаем контейнер
+            historyContainer.innerHTML = '';
+            
+            // Если история пуста
+            if (!history || history.length === 0) {
+                historyContainer.innerHTML = '<p style="color: var(--dark-gray); text-align: center; font-style: italic;">История запросов пуста</p>';
+                return;
+            }
+            
+            // Создаем элементы для каждого запроса
+            history.forEach((item, index) => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'activity-item';
+                historyItem.style.marginBottom = '10px';
+                
+                // Форматируем время
+                const date = new Date(item.timestamp);
+                const formattedTime = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+                
+                // Создаем содержимое элемента
+                historyItem.innerHTML = `
+                    <div class="activity-icon" style="background-color: ${item.success ? 'rgba(16, 124, 16, 0.1)' : 'rgba(227, 6, 19, 0.1)'}; color: ${item.success ? '#107c10' : '#E30613'};">
+                        <i class="fas ${item.success ? 'fa-check' : 'fa-times'}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-type">${item.card}</div>
+                        <div class="activity-details">${item.question}</div>
+                        ${item.success ? 
+                            `<div style="margin-top: 5px; font-size: 12px; color: #107c10;">Токенов: ${item.tokensUsed}</div>` : 
+                            `<div style="margin-top: 5px; font-size: 12px; color: #E30613;">Ошибка: ${item.error}</div>`
+                        }
+                        <div class="activity-time">${formattedTime}</div>
+                    </div>
+                `;
+                
+                // Добавляем элемент в контейнер
+                historyContainer.appendChild(historyItem);
+            });
+        }
+        
+        // Настройка вкладки тестирования API
+        function setupApiTestTab() {
+            const testForm = document.getElementById('api-test-form');
+            
+            if (testForm) {
+                testForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    if (!window.apiModule) {
+                        showNotification('Модуль API не загружен', 'error');
+                        return;
+                    }
+                    
+                    // Проверяем доступность API
+                    if (!window.apiModule.isApiAvailable()) {
+                        const apiSettings = window.apiModule.getSettings();
+                        const apiKey = localStorage.getItem('gptApiKey') || '';
+                        
+                        // Выводим подробную диагностику
+                        console.log('Диагностика API при тестировании:', {
+                            isApiAvailable: false,
+                            settings: apiSettings,
+                            apiKeyExists: !!apiKey,
+                            apiKeyLength: apiKey ? apiKey.length : 0,
+                            inLocalStorage: !!localStorage.getItem('gptApiKey'),
+                            isEnabledInSettings: apiSettings.isEnabled,
+                            isEnabledInStorage: localStorage.getItem('isGptEnabled') === 'true'
+                        });
+                        
+                        // Проверяем, в чем именно проблема
+                        if (!apiSettings.isEnabled) {
+                            showNotification('API отключен в настройках. Включите API в разделе "Настройки" и попробуйте снова.', 'warning');
+                        } else if (!apiKey || apiKey.length === 0) {
+                            showNotification('Отсутствует API ключ. Добавьте ключ в разделе "Настройки" и попробуйте снова.', 'warning');
+                        } else {
+                            showNotification('API недоступен. Проверьте настройки API.', 'error');
+                        }
+                        return;
+                    }
+                    
+                    // Получаем тестовые данные
+                    const cardTitle = document.getElementById('test-card-title').value.trim();
+                    const cardDescription = document.getElementById('test-card-description').value.trim();
+                    const question = document.getElementById('test-question').value.trim();
+                    
+                    // Проверяем наличие обязательных полей
+                    if (!cardTitle || !question) {
+                        showNotification('Заполните название карты и вопрос', 'warning');
+                        return;
+                    }
+                    
+                    // Отключаем кнопку на время выполнения теста
+                    const testButton = document.getElementById('run-api-test');
+                    testButton.disabled = true;
+                    testButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Выполняется...';
+                    
+                    // Обновляем контейнер результатов
+                    const resultContainer = document.getElementById('api-test-result');
+                    resultContainer.innerHTML = '<p style="text-align: center; color: var(--dark-gray);"><i class="fas fa-spinner fa-spin"></i> Выполняется запрос к API...</p>';
+                    
+                    try {
+                        // Выводим информацию перед тестом
+                        console.log('Запуск тестового запроса API с параметрами:', {
+                            cardTitle, 
+                            cardDescription,
+                            question,
+                            apiSettings: window.apiModule.getSettings()
+                        });
+                        
+                        // Выполняем тестовый запрос
+                        const result = await window.apiModule.testApiRequest({
+                            card: {
+                                title: cardTitle,
+                                description: cardDescription
+                            },
+                            question: question
+                        });
+                        
+                        console.log('Результат тестового запроса:', result);
+                        
+                        // Обновляем контейнер результатов
+                        if (result.success) {
+                            resultContainer.innerHTML = `
+                                <div style="border-left: 3px solid #107c10; padding-left: 15px; margin-bottom: 15px;">
+                                    <p style="color: #ffffff; white-space: pre-wrap;">${result.result}</p>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--dark-gray);">
+                                    <span>Время выполнения: ${(result.time / 1000).toFixed(2)} сек</span>
+                                    <span>${new Date(result.timestamp).toLocaleTimeString()}</span>
+                                </div>
+                            `;
+                            
+                            showNotification('Тест выполнен успешно', 'success');
+                        } else {
+                            resultContainer.innerHTML = `
+                                <div style="border-left: 3px solid #E30613; padding-left: 15px; margin-bottom: 15px;">
+                                    <p style="color: #E30613;">Ошибка: ${result.error}</p>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--dark-gray);">
+                                    <span>Время выполнения: ${(result.time / 1000).toFixed(2)} сек</span>
+                                    <span>${new Date(result.timestamp).toLocaleTimeString()}</span>
+                                </div>
+                            `;
+                            
+                            showNotification('Тест завершился с ошибкой', 'error');
+                        }
+                        
+                        // Обновляем статистику
+                        updateApiStats();
+                    } catch (error) {
+                        console.error('Ошибка при выполнении теста API:', error);
+                        
+                        resultContainer.innerHTML = `
+                            <div style="border-left: 3px solid #E30613; padding-left: 15px;">
+                                <p style="color: #E30613;">Критическая ошибка при выполнении теста: ${error.message}</p>
+                                <p style="color: #E30613; font-size: 12px;">Подробности в консоли разработчика (F12)</p>
+                            </div>
+                        `;
+                        
+                        showNotification('Ошибка при выполнении теста API', 'error');
+                    } finally {
+                        // Возвращаем кнопку в исходное состояние
+                        testButton.disabled = false;
+                        testButton.innerHTML = '<i class="fas fa-play-circle"></i> Запустить тест';
+                    }
+                });
+            }
+        }
+        
+        // Функция для отображения уведомлений
+        function showNotification(message, type = 'info') {
+            // Проверяем, не создаем ли мы бесконечную рекурсию
+            // Вместо arguments.callee используем проверку на идентичность функций
+            // Сохраняем оригинальную функцию перед возможным переопределением
+            const localShowNotification = showNotification;
+            
+            if (typeof window.showNotification === 'function' && window.showNotification !== localShowNotification) {
+                window.showNotification(message, type);
+                return;
+            }
+            
+            // Если функция недоступна, создаем простую реализацию
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.bottom = '20px';
+            notification.style.right = '20px';
+            notification.style.padding = '12px 20px';
+            notification.style.borderRadius = '4px';
+            notification.style.color = 'white';
+            notification.style.zIndex = '10000';
+            notification.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+            notification.style.opacity = '0';
+            notification.style.transition = 'opacity 0.3s ease';
+            
+            // Устанавливаем цвет в зависимости от типа
+            switch (type) {
+                case 'success':
+                    notification.style.backgroundColor = '#107c10';
+                    break;
+                case 'error':
+                    notification.style.backgroundColor = '#E30613';
+                    break;
+                case 'warning':
+                    notification.style.backgroundColor = '#FF8C00';
+                    break;
+                default:
+                    notification.style.backgroundColor = '#2196F3';
+            }
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Показываем уведомление
+            setTimeout(() => {
+                notification.style.opacity = '1';
+            }, 10);
+            
+            // Удаляем уведомление через 3 секунды
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+    </script>
+
+
+
+    <!-- Пример данных для графика и другие скрипты -->
+    <script>
+        // Пример данных для графика
+        const demoChartData = {
+            labels: ['1 июня', '2 июня', '3 июня', '4 июня', '5 июня', 'Сегодня'],
+            datasets: [{
+                label: 'Просмотры',
+                data: [120, 190, 300, 280, 340, 390],
+                backgroundColor: 'rgba(227, 6, 19, 0.2)',
+                borderColor: '#E30613',
+                borderWidth: 2,
+                tension: 0.4
+            }]
+        };
+    </script>
+    
+    <!-- Скрипты загружаются динамически через app-main.js -->
+</body>
+</html> 

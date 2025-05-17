@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MTS Design Weekend - Карты предсказаний</title>
+    <meta name="description" content="Выберите вопрос, сделайте фото карты и получите уникальное предсказание.">
+    
+    <!-- Стили -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components/buttons.css">
+    <link rel="stylesheet" href="css/components/screens.css">
+    <link rel="stylesheet" href="css/main-page.css">
+    <link rel="stylesheet" href="css/fixes.css">
+    
+    <!-- Инлайн-стили для экрана ошибок -->
+    <style>
+        #error-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+            z-index: 9999;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        #error-message-box {
+            background-color: rgba(227, 6, 19, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+        
+        #error-retry-button {
+            background-color: white;
+            color: #E30613;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        /* Улучшения для экрана загрузки */
+        #loading-init-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9998;
+        }
+        
+        .init-loader {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(227, 6, 19, 0.3);
+            border-radius: 50%;
+            border-top-color: #E30613;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .init-message {
+            margin-top: 20px;
+            font-size: 16px;
+            color: var(--text-color);
+        }
+    </style>
+    
+    <!-- Основной файл приложения -->
+    <script src="js/app-main.js"></script>
+    
+    <!-- Скрипт для интеграции с Telegram Mini App -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <!-- Экран инициализации -->
+    <div id="loading-init-screen">
+        <div class="init-loader"></div>
+        <p class="init-message">Загрузка приложения...</p>
+    </div>
+    
+    <!-- Контейнер для ошибок -->
+    <div id="error-container">
+        <div id="error-message-box">
+            <h3 style="margin-top: 0; margin-bottom: 20px;">Ошибка</h3>
+            <p id="error-message">Произошла ошибка при загрузке приложения</p>
+            <button id="error-retry-button" onclick="window.location.reload()">Перезагрузить</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <h1>Карты предсказаний</h1>
+            <p class="subtitle">MTS Design Weekend</p>
+        </header>
+
+        <main>
+            <!-- Экран приветствия -->
+            <div id="welcome-screen" class="screen active">
+                <div class="welcome-gif-container" style="text-align: center; margin-bottom: 25px;">
+                    <img src="img/start card/start.gif" alt="Карты предсказаний" style="max-width: 83%; height: auto; border-radius: 8px;">
+                </div>
+                
+                <p class="instruction">Сделай фото карты и узнай своё будущее</p>
+                
+                <div class="welcome-buttons">
+                    <button id="start-button" class="primary-button">
+                        <i class="icon-start"></i>Начать
+                    </button>
+                    <!-- Скрытый input для загрузки файла -->
+                    <input type="file" id="file-upload-input" accept="image/*" style="display: none;" />
+                </div>
+            </div>
+            
+            <!-- Экран выбора вопроса -->
+            <div id="question-screen" class="screen">
+                <!-- Контейнер для камеры, скрыт, но сохранен для обратной совместимости -->
+                <div class="camera-container" style="display: none;">
+                    <video id="camera-stream" autoplay playsinline style="display: none;"></video>
+                </div>
+                
+                <!-- Контейнер для предпросмотра фото, также скрыт -->
+                <div id="photo-preview-container" class="hidden">
+                    <!-- Сюда будет вставлено фото с камеры -->
+                    <div class="preview-controls" style="display: none;">
+                        <button id="use-photo-btn" class="primary-button">
+                            <i class="icon-check"></i>Использовать фото
+                        </button>
+                        <button id="remove-image" class="secondary-button">
+                            <i class="icon-close"></i>Удалить
+                        </button>
+                    </div>
+                </div>
+            
+                <h2 class="screen-title centered-title">Выберите вопрос</h2>
+                
+                <!-- Предпросмотр изображения -->
+                <div id="image-preview-container" class="image-preview-container" style="display: none;">
+                    <img id="image-preview" class="image-preview" src="#" alt="Предпросмотр">
+                </div>
+                
+                <!-- Опции вопросов -->
+                    <div class="question-options">
+                    <div class="question-option" data-question-id="1">
+                        <i class="icon-career"></i>
+                        <p>Я получу повышение?</p>
+                        </div>
+                    <div class="question-option" data-question-id="2">
+                        <i class="icon-future"></i>
+                        <p>Что меня ждет на проекте?</p>
+                        </div>
+                    <div class="question-option" data-question-id="0">
+                        <i class="icon-custom"></i>
+                        <p>Свой вопрос</p>
+                    </div>
+                </div>
+                
+                <!-- Поле для своего вопроса -->
+                <div class="input-group" id="custom-question-group" style="display: none;">
+                    <textarea id="question" placeholder="Например: Чему мне стоит уделить больше внимания в ближайшее время?"></textarea>
+                </div>
+                
+                <!-- Кнопки навигации -->
+                <div class="navigation-buttons">
+                    <button id="next-button" class="primary-button" disabled>Далее</button>
+                    <button id="back-button" class="secondary-button">Назад</button>
+                </div>
+            </div>
+            
+            <!-- Экран загрузки -->
+            <div id="loading-screen" class="screen">
+                <div class="loader-container">
+                    <div class="loader"></div>
+                </div>
+                
+                <div class="loading-text-container">
+                    <p class="loading-text">Анализируем карту и готовим ваше предсказание</p>
+                    <div class="loading-dots">
+                        <span class="dot">.</span>
+                        <span class="dot">.</span>
+                        <span class="dot">.</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Экран результата -->
+            <div id="result-screen" class="result-screen screen">
+                <div class="screen-header">
+                    <i class="screen-icon icon-magic"></i>
+                    <h2 id="prediction-title" class="screen-title">Название карты</h2>
+                </div>
+                
+                <div class="selection-method-indicator">Карта выбрана на основе вашего изображения</div>
+                
+                <div class="card-info">
+                    <div class="card-image-container">
+                        <img id="result-card-image" class="card-image" src="#" alt="Карта">
+                        <div class="fullscreen-icon"><i class="icon-fullscreen"></i></div>
+                    </div>
+                </div>
+                
+                <div class="prediction-container">
+                    <div id="prediction-text" class="prediction">
+                        Загрузка предсказания...
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="reset-button" class="primary-button">
+                        <i class="icon-refresh"></i>Новое предсказание
+                    </button>
+                    <button id="share-button" class="secondary-button">
+                        <i class="icon-share"></i>Поделиться
+                    </button>
+                </div>
+            
+                <div class="feedback-buttons">
+                    <p>Понравилось?</p>
+                    <div class="feedback-icons">
+                        <button class="btn-feedback" data-value="1"><i class="icon-sad"></i></button>
+                        <button class="btn-feedback" data-value="2"><i class="icon-neutral"></i></button>
+                        <button class="btn-feedback" data-value="3"><i class="icon-happy"></i></button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Модальное окно для полноэкранного просмотра карты -->
+            <div id="card-fullscreen-modal" class="modal">
+                <div class="modal-content card-modal-content">
+                    <button class="close-modal">&times;</button>
+                    <img id="fullscreen-card-img" class="fullscreen-card-img" src="#" alt="Карта">
+                    <h3 id="fullscreen-card-title" class="fullscreen-card-title">Название карты</h3>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <div class="footer-content">
+                <p class="footer-text">&copy; 2025 MTS Design Weekend</p>
+                <div class="footer-links">
+                    <a href="#" class="footer-link" id="about-link">О проекте</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Модальные окна -->
+    <div id="privacy-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Политика конфиденциальности</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Приложение "Карты предсказаний" обрабатывает только те данные, которые необходимы для его функционирования.</p>
+                <p>Мы не передаем ваши данные третьим лицам и не используем их в рекламных целях.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="about-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>О проекте</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>"Карты предсказаний" — проект, разработанный на MTS Design Weekend.</p>
+                <p>Основная идея — предоставить пользователям инструмент для саморефлексии и поиска ответов на волнующие вопросы через метафоры карт.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="help-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Помощь</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><b>Как это работает?</b></p>
+                <ol>
+                    <li>Выберите вопрос или запишите свой</li>
+                    <li>Сделайте фото карты или выберите случайную</li>
+                    <li>Получите уникальное предсказание</li>
+                </ol>
+                <p>Если у вас возникли проблемы, напишите нам на <a href="mailto:support@mts-design.ru">support@mts-design.ru</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Скрипт инициализации -->
+    <script>
+        // Скрываем экран загрузки после инициализации приложения или по таймауту
+        document.addEventListener('DOMContentLoaded', function() {
+            // Публикуем событие, что DOM загружен
+            if (window.EventBus && typeof window.EventBus.publish === 'function') {
+                window.EventBus.publish('DOM_CONTENT_LOADED', { timestamp: new Date().getTime() });
+            }
+            
+            // Устанавливаем таймаут на скрытие экрана загрузки
+            setTimeout(function() {
+                const loadingInitScreen = document.getElementById('loading-init-screen');
+                if (loadingInitScreen) {
+                    loadingInitScreen.style.display = 'none';
+                }
+            }, 3000); // 3 секунды максимум на загрузку
+            
+            // Настраиваем обработчик для отображения ошибок
+            window.showAppError = function(message) {
+                const errorContainer = document.getElementById('error-container');
+                const errorMessage = document.getElementById('error-message');
+                
+                if (errorContainer && errorMessage) {
+                    errorMessage.textContent = message || 'Произошла ошибка при загрузке приложения';
+                    errorContainer.style.display = 'flex';
+                    
+                    // Скрываем экран загрузки
+                    const loadingInitScreen = document.getElementById('loading-init-screen');
+                    if (loadingInitScreen) {
+                        loadingInitScreen.style.display = 'none';
+                    }
+                }
+            };
+            
+            // Перехватываем необработанные ошибки
+            window.addEventListener('error', function(event) {
+                console.error('Необработанная ошибка:', event.error || event.message);
+                window.showAppError('Произошла непредвиденная ошибка: ' + (event.error?.message || event.message));
+            });
+        });
+    </script>
+</body>
+</html> 

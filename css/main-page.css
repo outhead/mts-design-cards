@@ -1,0 +1,573 @@
+/* Дополнительные стили для главной страницы */
+
+.text-center {
+    text-align: center;
+}
+
+body {
+    background: linear-gradient(135deg, #080810 0%, #121628 50%, #1A1A35 100%);
+    background-size: 400% 400%;
+    animation: backgroundShimmer 15s ease infinite;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: radial-gradient(circle at 20% 20%, rgba(227, 6, 19, 0.07) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(227, 6, 19, 0.05) 0%, transparent 40%);
+    z-index: -1;
+}
+
+@keyframes backgroundShimmer {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.main-container {
+    max-width: 100%;
+    min-height: 100vh;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.8s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+    position: relative;
+    z-index: 1;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+header {
+    margin-bottom: 50px;
+    animation: fadeIn 0.8s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+    animation-delay: 0.1s;
+    animation-fill-mode: both;
+}
+
+h1 {
+    font-size: 42px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--white);
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    position: relative;
+    color: #FFFFFF;
+    text-shadow: 0 0 10px rgba(227, 6, 19, 0.2);
+}
+
+.subtitle {
+    font-size: 24px;
+    color: var(--white);
+    margin-bottom: 40px;
+    opacity: 0.9;
+    position: relative;
+}
+
+.subtitle::after {
+    content: "";
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    background: var(--primary-gradient);
+    border-radius: 2px;
+}
+
+.instruction {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--white);
+    text-align: center;
+    max-width: 500px;
+    margin: 0 auto 40px;
+    animation: fadeIn 0.8s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+    animation-delay: 0.2s;
+    animation-fill-mode: both;
+}
+
+.welcome-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    animation: fadeIn 0.8s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+    animation-delay: 0.3s;
+    animation-fill-mode: both;
+}
+
+.welcome-buttons .primary-button {
+    width: 100%;
+    padding: 15px 20px;
+    border-radius: 12px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: var(--primary-gradient);
+    color: var(--white);
+    border: none;
+    box-shadow: 0 8px 25px rgba(227, 6, 19, 0.4);
+    transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-buttons .primary-button:hover {
+    box-shadow: 0 12px 30px rgba(227, 6, 19, 0.5);
+}
+
+.welcome-buttons .primary-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 4px 15px rgba(227, 6, 19, 0.4);
+}
+
+.welcome-buttons .primary-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: 0.8s;
+    z-index: 1;
+}
+
+.welcome-buttons .primary-button:hover::before {
+    left: 100%;
+}
+
+.welcome-buttons .secondary-button {
+    width: 100%;
+    padding: 15px 20px;
+    border-radius: 12px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--white);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-buttons .secondary-button:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.welcome-buttons .secondary-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+footer {
+    margin-top: auto;
+    padding-top: 30px;
+    width: 100%;
+    animation: fadeIn 0.8s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+    animation-delay: 0.4s;
+    animation-fill-mode: both;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.footer-text {
+    color: var(--dark-gray);
+    font-size: 15px;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.footer-links {
+    display: flex;
+    gap: 25px;
+}
+
+.footer-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 15px;
+    transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+    position: relative;
+    letter-spacing: -0.01em;
+}
+
+.footer-link::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 1px;
+    bottom: -2px;
+    left: 0;
+    background-color: var(--primary-color);
+    transition: width 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+}
+
+.footer-link:hover::after,
+.footer-link:focus::after {
+    width: 100%;
+}
+
+.footer-link:hover,
+.footer-link:focus {
+    color: #FF5A5F;
+    text-shadow: 0 0 10px rgba(227, 6, 19, 0.3);
+    outline: none;
+}
+
+/* Улучшенные микровзаимодействия для кнопок */
+.primary-button i,
+.secondary-button i {
+    margin-right: 0;
+    transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+}
+
+.primary-button:hover i,
+.secondary-button:hover i {
+    transform: translateY(-2px) scale(1.1);
+}
+
+/* Адаптация для мобильных устройств */
+@media (max-width: 480px) {
+    .main-container {
+        padding: 20px;
+    }
+    
+    h1 {
+        font-size: 32px;
+    }
+    
+    .subtitle {
+        font-size: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .subtitle::after {
+        bottom: -12px;
+        width: 30px;
+    }
+    
+    .instruction {
+        font-size: 16px;
+        margin-bottom: 25px;
+    }
+    
+    .welcome-buttons {
+        gap: 12px;
+    }
+    
+    .welcome-buttons button {
+        padding: 12px 16px;
+    }
+    
+    .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+}
+
+/* Улучшенные стили для адаптивного дизайна */
+@media screen and (max-width: 767px) {
+    .main-container {
+        padding: 20px 15px;
+    }
+    
+    header h1 {
+        font-size: 28px;
+    }
+    
+    header .subtitle {
+        font-size: 16px;
+    }
+    
+    .welcome-buttons {
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+    }
+    
+    .primary-button, .secondary-button {
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+    
+    .card-info {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .card-image-container {
+        width: 220px;
+        height: 300px;
+        margin-bottom: 20px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 25px;
+    }
+    
+    .action-buttons button {
+        width: 100%;
+    }
+    
+    #question {
+        min-height: 60px;
+    }
+    
+    .glass-card {
+        padding: 20px;
+    }
+    
+    .loader {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    /* Улучшения для экрана вопросов */
+    .question-option {
+        padding: 12px 10px;
+    }
+    
+    .question-option i {
+        font-size: 16px;
+    }
+    
+    /* Улучшения для результатов */
+    .card-title {
+        font-size: 20px;
+        margin-top: 10px;
+    }
+    
+    .prediction {
+        font-size: 15px;
+        line-height: 1.4;
+    }
+    
+    /* Индикатор метода выбора карты */
+    .selection-method-indicator {
+        font-size: 12px;
+        margin: 5px 0 10px;
+    }
+}
+
+/* Дополнительные улучшения для очень маленьких экранов */
+@media screen and (max-width: 380px) {
+    header h1 {
+        font-size: 24px;
+    }
+    
+    header .subtitle {
+        font-size: 14px;
+    }
+    
+    .card-image-container {
+        width: 180px;
+        height: 250px;
+    }
+    
+    .instruction {
+        font-size: 15px;
+        padding: 0 5px;
+    }
+    
+    .question-option {
+        padding: 10px 8px;
+    }
+    
+    .question-option i {
+        min-width: 20px;
+        font-size: 14px;
+    }
+    
+    .question-option p {
+        font-size: 14px;
+    }
+    
+    .input-group label {
+        font-size: 15px;
+    }
+    
+    /* Компактные кнопки для очень маленьких экранов */
+    .primary-button, .secondary-button {
+        height: 44px;
+        font-size: 14px;
+    }
+    
+    /* Уменьшаем размер иконок */
+    .primary-button i, .secondary-button i {
+        font-size: 14px;
+    }
+}
+
+/* Улучшения для ландшафтной ориентации на мобильных устройствах */
+@media screen and (max-height: 600px) and (orientation: landscape) {
+    .main-container {
+        padding: 10px;
+    }
+    
+    header {
+        margin-bottom: 10px;
+    }
+    
+    header h1 {
+        font-size: 22px;
+        margin-bottom: 5px;
+    }
+    
+    header .subtitle {
+        font-size: 14px;
+        margin-top: 0;
+    }
+    
+    .instruction {
+        font-size: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .glass-card {
+        padding: 15px;
+    }
+    
+    /* Горизонтальное расположение элементов в ландшафтной ориентации */
+    .question-screen .question-section {
+        display: flex;
+        gap: 15px;
+    }
+    
+    .question-screen .instruction {
+        flex-basis: 30%;
+        margin-bottom: 0;
+    }
+    
+    .question-options {
+        flex-basis: 70%;
+    }
+    
+    /* Компактное отображение результатов */
+    .result-screen {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+    }
+    
+    .card-info {
+        flex-basis: 40%;
+    }
+    
+    .prediction-container {
+        flex-basis: 60%;
+    }
+    
+    .card-image-container {
+        width: 160px;
+        height: 220px;
+    }
+}
+
+/* Улучшенные анимации для перехода между экранами */
+.glass-card {
+    transform: translateY(0);
+    opacity: 1;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.glass-card:not(.active) {
+    transform: translateY(20px);
+    opacity: 0;
+}
+
+/* Улучшенная анимация загрузки */
+@keyframes loaderSpin {
+    0% { transform: rotate(0deg); border-color: rgba(227, 6, 19, 0.1) rgba(227, 6, 19, 0.5) rgba(227, 6, 19, 0.7) rgba(227, 6, 19, 0.9); }
+    25% { border-color: rgba(227, 6, 19, 0.9) rgba(227, 6, 19, 0.1) rgba(227, 6, 19, 0.5) rgba(227, 6, 19, 0.7); }
+    50% { border-color: rgba(227, 6, 19, 0.7) rgba(227, 6, 19, 0.9) rgba(227, 6, 19, 0.1) rgba(227, 6, 19, 0.5); }
+    75% { border-color: rgba(227, 6, 19, 0.5) rgba(227, 6, 19, 0.7) rgba(227, 6, 19, 0.9) rgba(227, 6, 19, 0.1); }
+    100% { transform: rotate(360deg); border-color: rgba(227, 6, 19, 0.1) rgba(227, 6, 19, 0.5) rgba(227, 6, 19, 0.7) rgba(227, 6, 19, 0.9); }
+}
+
+.loader {
+    border-width: 4px;
+    border-style: solid;
+    border-color: rgba(227, 6, 19, 0.1) rgba(227, 6, 19, 0.5) rgba(227, 6, 19, 0.7) rgba(227, 6, 19, 0.9);
+    animation: loaderSpin 1.5s linear infinite;
+}
+
+/* Улучшенные стили для доступности */
+.primary-button:focus, .secondary-button:focus, .question-option:focus-within {
+    outline: 3px solid rgba(227, 6, 19, 0.5);
+    box-shadow: 0 0 10px rgba(227, 6, 19, 0.3);
+}
+
+/* Классы доступности для скрытия элементов только визуально */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* Улучшенные стили для сенсорных целей */
+.touch-target {
+    min-width: 48px;
+    min-height: 48px;
+} 

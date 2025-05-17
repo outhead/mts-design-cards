@@ -1,0 +1,2801 @@
+:root {
+    --primary-color: #E30613; /* Красный цвет МТС */
+    --primary-gradient: linear-gradient(135deg, #E30613 0%, #FF375F 100%);
+    --secondary-color: #121212;
+    --accent-color: #FF375F;
+    --text-color: #FFFFFF;
+    --light-gray: #38383A;
+    --dark-gray: #8E8E93;
+    --white: #FFFFFF;
+    --background-color: #080810;
+    --card-background: rgba(30, 30, 42, 0.8);
+    --button-radius: 16px;
+    --card-radius: 24px;
+    --transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+    --font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --glassmorphism: rgba(30, 30, 42, 0.7);
+    --glassmorphism-border: 1px solid rgba(255, 255, 255, 0.1);
+    --glassmorphism-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    --normal-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    --apple-blur: saturate(180%) blur(20px);
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    --premium-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    --telegram-bg-color: var(--tg-theme-bg-color, #ffffff);
+    --telegram-text-color: var(--tg-theme-text-color, #000000);
+    --telegram-hint-color: var(--tg-theme-hint-color, #999999);
+    --telegram-link-color: var(--tg-theme-link-color, #2481cc);
+    --telegram-button-color: var(--tg-theme-button-color, #3390ec);
+    --telegram-button-text-color: var(--tg-theme-button-text-color, #ffffff);
+    --telegram-secondary-bg-color: var(--tg-theme-secondary-bg-color, #f1f1f1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+@keyframes backgroundShimmer {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: none;
+    }
+}
+
+@keyframes gradientFlow {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+body {
+    font-family: var(--font-family);
+    line-height: 1.6;
+    color: var(--text-color);
+    background: linear-gradient(135deg, #080810 0%, #121628 50%, #1A1A35 100%);
+    background-size: 400% 400%;
+    animation: backgroundShimmer 15s ease infinite;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    letter-spacing: -0.022em;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.02) 0%, transparent 40%);
+    z-index: -1;
+}
+
+.container {
+    max-width: 100%;
+    min-height: 100vh;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.8s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+    position: relative;
+    z-index: 1;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 50px;
+    position: relative;
+}
+
+h1 {
+    color: var(--text-color);
+    margin-bottom: 15px;
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.subtitle {
+    color: var(--dark-gray);
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.screen {
+    width: 100%;
+    max-width: 500px;
+    padding: 35px;
+    background-color: rgba(18, 18, 18, 0.6);
+    border-radius: var(--card-radius);
+    border: var(--glassmorphism-border);
+    box-shadow: var(--card-shadow);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: none;
+    animation: fadeIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+    transform-origin: center;
+    position: relative;
+    overflow: hidden;
+    transition: opacity 0.5s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+}
+
+.screen::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.screen.active {
+    display: block;
+}
+
+.instruction {
+    margin-bottom: 30px;
+    text-align: center;
+    font-size: 18px;
+    color: var(--text-color);
+    font-weight: 400;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+}
+
+.input-group {
+    margin-bottom: 35px;
+}
+
+label {
+    display: block;
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 17px;
+    letter-spacing: -0.01em;
+}
+
+textarea {
+    width: 100%;
+    padding: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--button-radius);
+    resize: vertical;
+    min-height: 140px;
+    font-family: inherit;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-color);
+    font-size: 17px;
+    transition: var(--transition);
+    backdrop-filter: blur(5px);
+    letter-spacing: -0.01em;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(227, 6, 19, 0.25);
+    background-color: rgba(255, 255, 255, 0.07);
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.file-upload-button {
+    display: block;
+    width: 100%;
+    padding: 20px;
+    border: 1px dashed rgba(255, 255, 255, 0.3);
+    border-radius: var(--button-radius);
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--white);
+    text-align: center;
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+}
+
+.file-upload-button:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.file-upload-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: 0.5s;
+}
+
+.file-upload-button:hover::before {
+    left: 100%;
+}
+
+button {
+    display: block;
+    width: 100%;
+    padding: 20px;
+    border: none;
+    border-radius: var(--button-radius);
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: 30px;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: -0.01em;
+    z-index: 1;
+}
+
+.primary-button {
+    background: var(--primary-gradient);
+    color: var(--white);
+    box-shadow: 0 8px 25px rgba(227, 6, 19, 0.4);
+}
+
+.primary-button:hover {
+    background-size: 250% 250%;
+    box-shadow: 0 12px 30px rgba(227, 6, 19, 0.4), 0 0 15px rgba(227, 6, 19, 0.2);
+}
+
+.primary-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 4px 15px rgba(227, 6, 19, 0.4);
+}
+
+.primary-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: 0.8s;
+    z-index: -1;
+}
+
+.primary-button:hover::before {
+    left: 100%;
+}
+
+.secondary-button {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.secondary-button:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: var(--primary-color);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.secondary-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+#loading-screen {
+    text-align: center;
+}
+
+.loader-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 40px auto;
+}
+
+.loader {
+    width: 70px;
+    height: 70px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top: 3px solid var(--primary-color);
+    border-right: 3px solid var(--primary-color);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: spin 1.2s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+    box-shadow: 0 0 20px rgba(227, 6, 19, 0.3);
+}
+
+.loader-pulse {
+    display: none;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.loading-text {
+    text-align: center;
+    margin: 30px 0 40px;
+    font-size: 20px;
+    color: var(--white);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.loading-facts {
+    padding: 25px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: var(--card-radius);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 40px;
+    text-align: center;
+    font-style: italic;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.loading-fact {
+    margin: 0;
+    color: var(--dark-gray);
+    font-size: 17px;
+    transition: opacity 0.5s ease;
+    line-height: 1.6;
+}
+
+/* Стили для экрана результатов без фона */
+.result-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 580px;
+    margin: 0 auto;
+    padding: 28px 24px;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    transition: none !important;
+}
+
+.result-screen.active {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 20 !important;
+}
+
+.result-screen .screen-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 25px;
+    position: relative;
+    width: 100%;
+}
+
+.result-screen .screen-icon {
+    font-size: 35px;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    display: block;
+    text-shadow: 0 0 10px rgba(227, 6, 19, 0.3);
+}
+
+.result-screen .screen-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--white);
+    margin: 0;
+    letter-spacing: -0.03em;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 0, 0, 0.7);
+}
+
+.result-screen .card-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 24px;
+    animation: floatingCard 6s ease-in-out infinite;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    width: 100%;
+}
+
+.result-screen.active .card-info {
+    transform: translateY(0);
+    opacity: 1;
+    transition-delay: 0.2s;
+}
+
+.card-image-container {
+    width: 180px;
+    height: 180px;
+    overflow: hidden;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    position: relative;
+    background-color: #F8F8F8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-image-container::after {
+    display: none;
+}
+
+.card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+}
+
+.card-image:hover {
+    transform: scale(1.08);
+}
+
+.prediction-container {
+    position: relative;
+    margin: 10px 0 24px;
+    background: rgba(30, 30, 42, 0.6);
+    border-radius: var(--card-radius);
+    padding: 3px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transform: translateY(20px);
+    opacity: 1 !important;
+    transition: none !important;
+    width: 100%;
+    max-width: 100%;
+    border: 1px solid rgba(227, 6, 19, 0.2);
+}
+
+.result-screen.active .prediction-container {
+    transform: translateY(0);
+    opacity: 1;
+    transition-delay: 0.4s;
+}
+
+.prediction-container::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    bottom: -1px;
+    background: linear-gradient(45deg, 
+        rgba(227, 6, 19, 0.5) 0%, 
+        transparent 50%, 
+        rgba(227, 6, 19, 0.5) 100%);
+    z-index: -1;
+    border-radius: calc(var(--card-radius) + 1px);
+    opacity: 0.7;
+}
+
+.prediction {
+    padding: 28px 24px;
+    background-color: transparent;
+    border-radius: calc(var(--card-radius) - 3px);
+    line-height: 1.7;
+    white-space: pre-line;
+    font-size: 17px;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: -0.01em;
+    font-weight: 400;
+    color: #FFFFFF;
+    text-align: left;
+    display: block;
+    width: 100%;
+    min-height: 120px;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.prediction::before {
+    content: "\201C"; /* Unicode для открытой кавычки */
+    position: absolute;
+    top: 5px;
+    left: 10px;
+    font-size: 50px;
+    line-height: 0.5;
+    color: var(--primary-color);
+    opacity: 0.3;
+    font-family: Georgia, serif;
+}
+
+.prediction::after {
+    content: "\201D"; /* Unicode для закрытой кавычки */
+    position: absolute;
+    bottom: 5px;
+    right: 12px;
+    font-size: 50px;
+    line-height: 0.5;
+    color: var(--primary-color);
+    opacity: 0.3;
+    font-family: Georgia, serif;
+}
+
+/* Стили для кнопок действий в результатах */
+.result-screen .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    margin: 25px auto 15px;
+    max-width: 350px;
+    transform: translateY(0);
+    opacity: 1;
+    transition: none;
+}
+
+.result-screen.active .action-buttons {
+    transform: translateY(0);
+    opacity: 1;
+    transition-delay: 0.6s;
+}
+
+/* Общие стили для всех кнопок в результатах - фиксированная высота */
+.result-screen .action-buttons button {
+    width: 100%;
+    height: 56px !important; /* Жестко фиксированная высота */
+    min-height: 56px !important;
+    max-height: 56px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 12px;
+    margin: 0;
+    transition: all 0.3s ease;
+    padding: 0 20px;
+    box-sizing: border-box !important; /* Гарантируем, что padding включен в высоту */
+    line-height: 1 !important; /* Предотвращаем влияние line-height на высоту */
+}
+
+/* Красная кнопка "Поделиться" */
+.result-screen .action-buttons #share-button {
+    background: var(--primary-gradient);
+    border: none;
+    color: white;
+    box-shadow: 0 10px 20px rgba(227, 6, 19, 0.3);
+}
+
+/* Прозрачная кнопка "Новое предсказание" */
+.result-screen .action-buttons #reset-button {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+/* Восстанавливаем hover анимации */
+.result-screen .action-buttons #share-button:hover {
+    background: linear-gradient(135deg, #FF5A5F 0%, #E30613 100%);
+    box-shadow: 0 10px 25px rgba(227, 6, 19, 0.5);
+}
+
+.result-screen .action-buttons #reset-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: var(--primary-color);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Медиа-запросы для адаптивности всего экрана результатов */
+@media (max-width: 768px) {
+    .result-screen {
+        padding: 24px 20px;
+    }
+    
+    .result-screen .screen-icon {
+        font-size: 30px;
+        margin-bottom: 10px;
+    }
+    
+    .result-screen .screen-title {
+        font-size: 28px;
+    }
+    
+    .result-screen .card-image-container {
+        width: 160px;
+        height: 160px;
+    }
+    
+    .result-screen .card-title {
+        font-size: 22px;
+    }
+    
+    .prediction {
+        padding: 24px 20px;
+        font-size: 16px;
+        min-height: 100px;
+    }
+    
+    .result-screen .action-buttons {
+        max-width: 350px;
+    }
+    
+    .result-screen .action-buttons button {
+        height: 52px !important;
+        min-height: 52px !important;
+        max-height: 52px !important;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .result-screen {
+        padding: 20px 16px;
+    }
+    
+    .result-screen .screen-icon {
+        font-size: 28px;
+        margin-bottom: 8px;
+    }
+    
+    .result-screen .screen-title {
+        font-size: 24px;
+    }
+    
+    .result-screen .card-image-container {
+        width: 140px;
+        height: 140px;
+    }
+    
+    .result-screen .card-title {
+        font-size: 20px;
+    }
+    
+    .prediction {
+        padding: 20px 16px;
+        font-size: 15px;
+        min-height: 90px;
+    }
+    
+    .result-screen .action-buttons {
+        max-width: 280px;
+        gap: 15px;
+    }
+    
+    .result-screen .action-buttons button {
+        height: 48px !important;
+        min-height: 48px !important;
+        max-height: 48px !important;
+        font-size: 15px;
+        padding: 0 15px;
+    }
+}
+
+.feedback-buttons {
+    margin-top: 32px;
+    text-align: center;
+    width: 100%;
+}
+
+.feedback-buttons p {
+    margin-bottom: 16px;
+    color: var(--dark-gray);
+    font-size: 15px;
+}
+
+.feedback-buttons div {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.btn-feedback {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--dark-gray);
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+    margin: 0;
+    padding: 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Стили для предпросмотра изображения */
+.image-preview-container {
+    position: relative;
+    margin-top: 20px;
+    border-radius: var(--button-radius);
+    overflow: hidden;
+    max-width: 100%;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transition: var(--transition);
+}
+
+.image-preview-container:hover {
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.image-preview {
+    display: block;
+    max-width: 100%;
+    max-height: 260px;
+    margin: 0 auto;
+    border-radius: var(--button-radius);
+    transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+}
+
+.image-preview:hover {
+    transform: scale(1.03);
+}
+
+/* Специальные стили для превью на экране вопроса */
+#question-screen .image-preview-container {
+    margin: 10px auto 15px;
+    width: 180px;
+    height: 120px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+    animation: fadeInPreview 0.5s ease-out forwards;
+    transition: all 0.3s ease;
+    /* Убираем фон под превью картинки */
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+@keyframes fadeInPreview {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#question-screen .image-preview-container:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+#question-screen .image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#question-screen .image-preview:hover {
+    transform: scale(1.05);
+}
+
+/* Новые стили для нового заголовка "Выберите вопрос" */
+#question-screen .screen-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #FFFFFF;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Компактные стили для мобильных устройств */
+@media (max-width: 480px) {
+    #question-screen .image-preview-container {
+        width: 150px;
+        height: 100px;
+        margin: 10px auto 15px;
+    }
+    
+    #question-screen .screen-title {
+        font-size: 22px;
+    }
+    
+    #question-screen .question-options {
+        margin-bottom: 15px;
+    }
+    
+    #question-screen .question-option {
+        padding: 12px !important;
+        border-radius: 12px !important;
+    }
+    
+    #question-screen .question-option p {
+        font-size: 16px;
+    }
+    
+    #question-screen .input-group label {
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+}
+
+@media (max-height: 600px) and (max-width: 480px) {
+    #question-screen .question-option {
+        padding: 10px !important;
+    }
+    
+    #question-screen .image-preview-container {
+        width: 120px;
+        height: 80px;
+        margin: 8px auto 12px;
+    }
+    
+    #question-screen .screen-title {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+}
+
+/* Более компактная версия экрана вопроса */
+#question-screen .instruction {
+    margin-bottom: 10px; /* Новый уменьшенный отступ */
+    font-size: 18px;
+    font-weight: 500;
+    text-align: center;
+}
+
+#question-screen .question-options {
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+#question-screen .question-option {
+    padding: 14px;
+}
+
+#question-screen .question-option p {
+    font-size: 17px;
+    line-height: 1.4;
+    margin: 0;
+}
+
+#question-screen .input-group label {
+    font-size: 17px;
+    margin-bottom: 8px;
+}
+
+#question-screen #question {
+    font-size: 17px;
+    min-height: 120px;
+}
+
+/* ... existing code ... */
+
+/* QR-код скрыт полностью - начало секции */
+.qr-code-section,
+.qr-code-container,
+.qr-code-caption,
+.qr-scan-container,
+.qr-scan-image,
+.qr-sample,
+#sample-qr-code,
+.qr-code,
+[id*="qr-code"],
+[class*="qr-code"],
+[id*="qrcode"],
+[class*="qrcode"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+    pointer-events: none !important;
+    z-index: -999 !important;
+}
+/* QR-код скрыт полностью - конец секции */
+
+/* Пустые блоки стилей для сохранения совместимости с остальным кодом */
+.qr-code-section { display: none !important; }
+.qr-code-container { display: none !important; }
+.qr-code-container::after { display: none !important; }
+.qr-code-container img { display: none !important; }
+.qr-code-container img:hover { display: none !important; }
+.qr-code-caption { display: none !important; }
+.qr-scan-container { display: none !important; }
+.qr-scan-container:hover { display: none !important; }
+.qr-scan-image { display: none !important; }
+.qr-scan-image img { display: none !important; }
+
+/* Telegram WebApp Integration */
+body.telegram-app {
+    background-color: var(--telegram-bg-color);
+    color: var(--telegram-text-color);
+}
+
+.telegram-app .primary-button {
+    background-color: var(--telegram-button-color);
+    color: var(--telegram-button-text-color);
+}
+
+.telegram-app .secondary-button {
+    background-color: var(--telegram-secondary-bg-color);
+    color: var(--telegram-text-color);
+}
+
+/* Адаптация для темной темы */
+.telegram-app.dark {
+    color-scheme: dark;
+}
+
+.telegram-app h1 {
+    color: var(--telegram-text-color);
+}
+
+.telegram-app .screen {
+    background-color: var(--telegram-secondary-bg-color);
+}
+
+/* Адаптация под мобильные устройства */
+@media (max-width: 480px) {
+    .container {
+        padding: 20px;
+    }
+    
+    .screen {
+        padding: 30px 25px;
+        border-radius: 20px;
+    }
+    
+    h1 {
+        font-size: 32px;
+    }
+    
+    .subtitle {
+        font-size: 18px;
+    }
+    
+    .screen-title {
+        font-size: 24px;
+    }
+    
+    .instruction {
+        font-size: 16px;
+    }
+    
+    .card-image-container {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .prediction {
+        padding: 25px;
+        font-size: 16px;
+    }
+    
+    button {
+        padding: 18px;
+    }
+    
+    .qr-scan-image {
+        width: 150px;
+        height: 150px;
+    }
+}
+
+/* Улучшенные анимации для элементов */
+@keyframes floatingCard {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-15px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+/* Стили для админ-панели - широкоформатное отображение */
+@media (min-width: 1400px) {
+    .admin-container {
+        max-width: 1800px !important;
+        padding: 30px 50px !important;
+    }
+    
+    .card-list {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)) !important;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
+    }
+    
+    .admin-card {
+        padding: 30px !important;
+    }
+}
+
+/* Стили для иконок внутри label */
+.input-icon {
+    color: var(--primary-color);
+    margin-right: 10px;
+    font-size: 17px;
+}
+
+/* Улучшенные стили для футера */
+footer {
+    margin-top: 50px;
+    padding-top: 25px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.footer-text {
+    color: var(--dark-gray);
+    font-size: 15px;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.footer-links {
+    display: flex;
+    gap: 25px;
+}
+
+.footer-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 15px;
+    transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+    position: relative;
+    letter-spacing: -0.01em;
+}
+
+.footer-link::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 1px;
+    bottom: -2px;
+    left: 0;
+    background-color: var(--primary-color);
+    transition: width 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+}
+
+.footer-link:hover::after,
+.footer-link:focus::after {
+    width: 100%;
+}
+
+.footer-link:hover,
+.footer-link:focus {
+    color: #FF5A5F;
+    text-shadow: 0 0 10px rgba(227, 6, 19, 0.3);
+    outline: none;
+}
+
+/* Улучшенные микровзаимодействия для кнопок */
+.primary-button i,
+.secondary-button i {
+    margin-right: 10px;
+    transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+}
+
+.primary-button:hover i,
+.secondary-button:hover i {
+    transform: scale(1.1);
+}
+
+/* Добавляем стили для фонового canvas и стеклянного куба */
+#background-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.8;
+    transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+}
+
+/* Стили для секретного входа и модальных окон доступа к админке */
+.secret-cube-hint {
+    display: none;
+}
+
+.secret-cube-hint.visible {
+    display: none;
+}
+
+/* Стили для входных форм в модальном окне */
+.form-control {
+    width: 100%;
+    padding: 15px;
+    border-radius: 12px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    font-family: inherit;
+        font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(227, 6, 19, 0.25);
+    background-color: rgba(255, 255, 255, 0.07);
+}
+
+/* Переопределение стилей для модального окна на главной странице */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: var(--glassmorphism);
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    border: var(--glassmorphism-border);
+    box-shadow: var(--glassmorphism-shadow);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.modal-header::after {
+    content: "";
+    position: absolute;
+    bottom: -15px;
+    left: 0;
+    width: 80px;
+    height: 3px;
+    background: var(--primary-gradient);
+    border-radius: 3px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 24px;
+    color: var(--white);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: var(--dark-gray);
+    transition: color 0.3s ease, transform 0.3s ease;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    padding: 0;
+    margin: 0;
+}
+
+.close-modal:hover {
+    color: var(--primary-color);
+    transform: rotate(90deg);
+}
+
+.btn {
+    padding: 12px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    border: none;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.btn-feedback {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--dark-gray);
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+    margin: 0;
+    padding: 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.btn-feedback:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    color: var(--white);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.btn-feedback.active {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border-color: var(--primary-color);
+    box-shadow: 0 5px 20px rgba(227, 6, 19, 0.5);
+}
+
+/* Стили для элементов сбора данных и аналитики */
+[data-analytics] {
+    position: relative;
+}
+
+[data-analytics]::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: transparent;
+    transition: background 0.3s ease;
+    pointer-events: none;
+}
+
+[data-analytics]:active::after {
+    background: rgba(227, 6, 19, 0.1);
+}
+
+/* Улучшенные стили для акцентированных кнопок */
+.primary-button[data-analytics] {
+    position: relative;
+    overflow: hidden;
+}
+
+.primary-button[data-analytics]::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    z-index: -1;
+    background: linear-gradient(45deg, var(--primary-color), transparent, var(--primary-color));
+    background-size: 200% 200%;
+    animation: gradientBorder 3s linear infinite;
+    border-radius: calc(var(--button-radius) + 2px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.primary-button[data-analytics]:hover::before {
+    opacity: 1;
+}
+
+@keyframes gradientBorder {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Стили для кнопок с данными аналитики при фокусе для доступности */
+[data-analytics]:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Стили для модального окна согласия */
+#consent-modal .modal-content {
+    max-width: 450px;
+}
+
+#consent-modal p {
+    color: var(--text-color);
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+#consent-modal ul {
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+#consent-modal ul li {
+    margin-bottom: 5px;
+}
+
+/* Улучшенные стили для текстовых областей с отслеживанием */
+textarea[data-analytics], input[data-analytics] {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+textarea[data-analytics]:focus, input[data-analytics]:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(227, 6, 19, 0.25);
+}
+
+/* Индикатор типа "запись данных" для демонстрации */
+.data-collection-active .primary-button[data-analytics]::after {
+    content: "";
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #4CD964;
+    top: 10px;
+    right: 10px;
+    box-shadow: 0 0 5px rgba(76, 217, 100, 0.5);
+}
+
+/* Стили для контейнера сканирования QR-кода */
+.qr-scan-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 30px 0;
+    padding: 25px;
+    background-color: rgba(255, 255, 255, 0.03);
+    border-radius: var(--card-radius);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    transition: var(--transition);
+}
+
+.qr-scan-container:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.qr-scan-image {
+    width: 180px;
+    height: 180px;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: var(--button-radius);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.qr-scan-image img {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 8px;
+}
+
+/* Стили для опций вопросов */
+.question-options {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 30px;
+}
+
+.question-option {
+    display: flex;
+    align-items: center;
+    padding: 18px;
+    background-color: rgba(255, 255, 255, 0.08);
+    border-radius: var(--button-radius);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.question-option::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--primary-gradient);
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.question-option:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.question-option:hover::before {
+    opacity: 0.3;
+}
+
+.question-option.selected {
+    background-color: rgba(227, 6, 19, 0.12);
+    border-color: var(--primary-color);
+}
+
+.question-option.selected::before {
+    opacity: 1;
+}
+
+.question-option i {
+    font-size: 26px;
+    color: var(--primary-color);
+    margin-right: 18px;
+    min-width: 32px;
+    text-align: center;
+    text-shadow: 0 0 10px rgba(227, 6, 19, 0.4);
+}
+
+.question-option p {
+    margin: 0;
+    color: var(--white);
+    font-size: 16px;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    font-weight: 500;
+}
+
+/* Стили для навигационных кнопок */
+.navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.navigation-buttons button {
+    flex: 1;
+    margin-top: 5px;
+}
+
+/* Улучшение стилей glassmorphism при наличии фонового куба */
+.glassmorphism {
+    background-color: rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-card {
+    background: rgba(18, 18, 18, 0.7);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: block;
+    overflow: hidden;
+}
+
+/* Улучшение читаемости текста на темном фоне */
+.text-shadow-sm {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+/* Скрываем все навигационные кнопки на главном экране по умолчанию, кроме кнопок фото и загрузки */
+#welcome-screen .navigation-buttons,
+#welcome-screen .backward-btn,
+#welcome-screen .forward-btn {
+    display: none !important;
+}
+
+/* Стили для кнопки "Далее" */
+#use-photo-btn {
+    display: none !important; /* По умолчанию скрыта */
+    margin-top: 20px;
+    z-index: 5;
+}
+#use-photo-btn.active {
+    display: block !important;
+}
+
+/* Удаляю стили связанные с кубами */
+
+// ... existing code ...
+.secret-cube-hint {
+    display: none;
+}
+
+.secret-cube-hint.visible {
+    display: none;
+}
+// ... existing code ...
+
+/* Удаляю все стили связанные с кубами и их анимациями */
+#instruction-cube-container {
+    display: none;
+}
+
+@keyframes cubePulse {
+    0% { opacity: 0; }
+    100% { opacity: 0; }
+}
+
+.css-cube {
+    display: none;
+}
+
+@keyframes css-cube-rotate {
+    0% { transform: rotateX(0) rotateY(0); }
+    100% { transform: rotateX(0) rotateY(0); }
+}
+
+.cube-face {
+    display: none;
+}
+
+.cube-face-front, .cube-face-back, .cube-face-right, 
+.cube-face-left, .cube-face-top, .cube-face-bottom {
+    display: none;
+}
+
+.cube-center-container {
+    display: none;
+}
+
+@media (max-width: 768px) {
+  #instruction-cube-container {
+    display: none;
+  }
+}
+
+#instruction-cube-container {
+    display: none;
+}
+
+/* Стили для экрана с вопросом */
+#question-screen {
+  display: none;
+  flex-direction: column;
+  gap: 1rem; /* Новый уменьшенный gap */
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  /* Добавляем/изменяем padding-top */
+  padding-top: 15px !important; /* Уменьшаем верхний отступ */ 
+  /* Убедимся, что остальные padding сохранены или установлены по умолчанию, если нужны */
+  padding-left: 5px !important; /* из существующего стиля .question-options и др. */
+  padding-right: 5px !important; /* из существующего стиля .question-options и др. */
+  padding-bottom: 20px !important; /* Примерное значение, можно будет подстроить */
+}
+
+#question-screen.active {
+  display: flex;
+}
+
+.screen-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  background: rgba(30, 30, 42, 0.7);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.screen-icon {
+  font-size: 24px;
+  color: var(--primary-color);
+  margin-right: 0.75rem;
+}
+
+.screen-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.question-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 5px !important;
+}
+
+.question-option {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 12px !important;
+  padding: 15px !important;
+  cursor: pointer;
+  transition: all 0.3s ease !important;
+  margin-bottom: 10px !important;
+}
+
+.question-option:hover {
+  background-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+.question-option.selected {
+  background-color: rgba(227, 6, 19, 0.2) !important;
+  border-color: var(--primary-color) !important;
+}
+
+.question-option i {
+  color: var(--primary-color);
+  font-size: 1.25rem;
+  margin-right: 1rem;
+}
+
+.question-option p {
+  color: white;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.input-group {
+  margin-bottom: 1.5rem;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 5px !important;
+}
+
+.input-group label {
+  display: block;
+  color: white;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.input-icon {
+  color: var(--primary-color);
+  margin-right: 0.5rem;
+}
+
+#question {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  color: white;
+  font-size: 1rem;
+  min-height: 100px;
+  resize: vertical;
+  transition: all 0.3s ease;
+}
+
+#question:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 15px rgba(227, 6, 19, 0.3);
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 25px;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 5px !important;
+}
+
+.primary-button, .secondary-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.primary-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  flex: 1;
+}
+
+.primary-button:hover:not(:disabled) {
+  background-color: #c50510;
+  box-shadow: 0 4px 12px rgba(227, 6, 19, 0.4);
+}
+
+.primary-button:disabled {
+  background-color: #6e6e6e;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.secondary-button {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.secondary-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.prediction.active {
+  animation: fadeInText 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeInText {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-image.loaded {
+  opacity: 1 !important;
+  animation: none !important;
+}
+
+/* Адаптивные стили для кнопок на разных устройствах */
+@media (max-width: 992px) {
+    .result-screen .action-buttons {
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    .result-screen .action-buttons {
+        max-width: 350px;
+    }
+    
+    .result-screen .action-buttons button {
+        height: 52px !important;
+        min-height: 52px !important;
+        max-height: 52px !important;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .result-screen .action-buttons {
+        max-width: 280px !important;
+        gap: 15px !important; /* Единый отступ между кнопками на всех разрешениях */
+    }
+    
+    .result-screen .action-buttons button {
+        height: 48px !important;
+        min-height: 48px !important;
+        max-height: 48px !important;
+        font-size: 15px;
+        padding: 0 15px;
+    }
+}
+
+/* Стили для инструкции на первом экране - исправленные */
+#welcome-screen .instruction {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #FFFFFF;
+    text-align: center;
+    margin: 0 auto 40px;
+    max-width: 450px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+/* Убираем возможные остатки стилей темного фона */
+#welcome-screen {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+#instruction-cube-container {
+    display: none;
+}
+
+/* Медиа-запросы для адаптивности текста */
+@media (max-width: 480px) {
+    #welcome-screen .instruction {
+        font-size: 16px;
+        margin-bottom: 30px;
+        max-width: 320px;
+    }
+}
+
+/* Стили для кнопок на первом экране */
+.take-photo-button, .upload-photo-button {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #000000;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    height: 44px;
+}
+
+.take-photo-button:hover, .upload-photo-button:hover {
+    background-color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Стиль для кнопки "Далее" */
+#use-photo-btn {
+    height: 44px;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 16px;
+}
+
+/* Улучшенный стиль для контейнера камеры */
+.camera-container {
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: none;
+}
+
+.camera-container.active {
+    display: flex;
+}
+
+/* Стили для инструкции на первом экране */
+#welcome-screen .instruction {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #FFFFFF;
+    text-align: center;
+    margin: 0 auto 40px;
+    max-width: 450px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+/* Медиа-запросы для адаптивности */
+@media (max-width: 480px) {
+    #welcome-screen .instruction {
+        font-size: 16px;
+        margin-bottom: 30px;
+        max-width: 320px;
+    }
+    
+    .take-photo-button, .upload-photo-button, #use-photo-btn {
+        height: 40px;
+        font-size: 15px;
+    }
+}
+
+/* Полностью скрываем кнопку "Далее" и её стили */
+#use-photo-btn,
+[id*="use-photo-btn"],
+[class*="use-photo-btn"],
+button[id*="use-photo"],
+button[class*="use-photo"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+    pointer-events: none !important;
+    z-index: -999 !important;
+}
+
+/* Убираем отображение имени файла */
+#question-screen [class*="download"],
+#question-screen [id*="download"],
+#question-screen img[src*="download"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+}
+
+/* Обновленные стили для экрана вопроса - все блоки прозрачные */
+#question-screen .question-options,
+#question-screen .input-group,
+#question-screen .navigation-buttons {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding: 5px !important;
+}
+
+/* Стили для текстового поля */
+#question {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Стили для навигационных кнопок */
+.navigation-buttons button {
+    margin-top: 10px !important;
+}
+
+/* Стили для навигационных кнопок на экране вопросов (вертикальное расположение) */
+.vertical-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Отступ между кнопками */
+    width: 100%;
+    margin-top: 20px;
+}
+
+.vertical-buttons button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    font-size: 16px;
+    gap: 8px;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+}
+
+.vertical-buttons .primary-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 15px rgba(227, 6, 19, 0.3);
+}
+
+.vertical-buttons .primary-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: rgba(227, 6, 19, 0.5);
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.vertical-buttons .primary-button:hover:not(:disabled) {
+    box-shadow: 0 8px 20px rgba(227, 6, 19, 0.45);
+}
+
+.vertical-buttons .primary-button.active {
+    animation: button-activate 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+.vertical-buttons .secondary-button {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.vertical-buttons .secondary-button:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes button-activate {
+    0% { transform: scale(0.95); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@media (max-width: 480px) {
+    .vertical-buttons {
+        gap: 15px; /* Отступ между кнопками */
+        margin-top: 15px;
+    }
+    
+    .vertical-buttons button {
+        padding: 12px;
+        font-size: 15px;
+    }
+}
+
+/* Стили для кнопок на главном экране */
+.welcome-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Отступ между кнопками */
+    width: 100%;
+    max-width: 300px;
+    margin: 20px auto;
+    z-index: 10;
+    position: relative;
+}
+
+.welcome-buttons button {
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.welcome-buttons .primary-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 15px rgba(227, 6, 19, 0.3);
+}
+
+.welcome-buttons .primary-button:hover {
+    box-shadow: 0 6px 20px rgba(227, 6, 19, 0.4);
+}
+
+.welcome-buttons .secondary-button {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.welcome-buttons .secondary-button:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Убираем привязку к низу для маленьких экранов */
+@media (max-width: 480px) {
+    .welcome-buttons {
+        position: static;
+        bottom: auto;
+        left: auto;
+        transform: none;
+        margin: 20px auto;
+        width: 90%;
+        max-width: 300px;
+        gap: 15px; /* Отступ между кнопками */
+    }
+    
+    #welcome-screen {
+        padding-bottom: 30px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+    }
+}
+
+/* ... existing code ... */
+
+/* Дополнительные стили для мобильных устройств */
+@media (max-width: 480px) {
+    .welcome-buttons {
+        position: static;
+        bottom: auto;
+        transform: none;
+        left: auto;
+        margin: 20px auto;
+        width: 90%;
+        max-width: 300px;
+        gap: 15px; /* Отступ между кнопками */
+        z-index: 10;
+    }
+    
+    .welcome-buttons button {
+        padding: 14px 20px !important;
+        border-radius: 12px !important;
+        font-size: 16px !important;
+    }
+    
+    #welcome-screen {
+        padding-bottom: 30px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+    }
+    
+    /* Улучшаем экран вопроса на мобильных устройствах */
+    #question-screen {
+        padding: 20px !important;
+        gap: 12px !important;
+    }
+    
+    #question-screen #image-preview-container {
+        width: 140px !important;
+        height: 95px !important;
+        margin: 5px auto 10px !important;
+    }
+    
+    #question-screen .screen-title {
+        font-size: 20px !important;
+        margin-bottom: 10px !important;
+    }
+    
+    #question-screen .instruction {
+        font-size: 16px !important;
+        margin-bottom: 5px !important;
+    }
+    
+    #question-screen .question-option {
+        padding: 12px !important;
+    }
+    
+    #question-screen .question-option p {
+        font-size: 15px !important;
+    }
+    
+    #question-screen .input-group label {
+        font-size: 16px !important;
+        margin-bottom: 6px !important;
+    }
+    
+    #question-screen #question {
+        min-height: 80px !important;
+        padding: 10px !important;
+        font-size: 15px !important;
+    }
+    
+    /* Улучшаем экран результатов на мобильных устройствах */
+    #result-screen {
+        padding: 20px 16px !important;
+    }
+    
+    #result-screen .screen-title {
+        font-size: 22px !important;
+    }
+    
+    #result-screen .card-image-container {
+        width: 140px !important;
+        height: 140px !important;
+    }
+    
+    #result-screen #card-title {
+        font-size: 20px !important;
+        margin-top: 10px !important;
+    }
+    
+    #result-screen #prediction-text {
+        font-size: 16px !important;
+        line-height: 1.5 !important;
+        padding: 16px !important;
+    }
+    
+    /* Улучшаем отображение футера */
+    footer {
+        margin-top: 30px !important;
+        padding-top: 20px !important;
+    }
+    
+    .footer-content {
+        gap: 10px !important;
+    }
+    
+    .footer-links {
+        gap: 15px !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+    }
+    
+    .footer-link {
+        font-size: 14px !important;
+    }
+}
+
+/* Стили для очень узких экранов */
+@media (max-width: 360px) {
+    .container {
+        padding: 15px !important;
+    }
+    
+    h1 {
+        font-size: 28px !important;
+        margin-bottom: 10px !important;
+    }
+    
+    .subtitle {
+        font-size: 16px !important;
+    }
+    
+    #welcome-screen p {
+        font-size: 16px !important;
+        line-height: 1.4 !important;
+    }
+    
+    .welcome-buttons {
+        width: 95% !important;
+        gap: 10px !important;
+    }
+    
+    .welcome-buttons button {
+        padding: 10px 15px !important;
+        font-size: 14px !important;
+    }
+    
+    /* Настройки для экрана вопроса на очень узких экранах */
+    #question-screen {
+        padding: 15px !important;
+        gap: 10px !important;
+    }
+    
+    #question-screen #image-preview-container {
+        width: 120px !important;
+        height: 80px !important;
+    }
+    
+    #question-screen .screen-title {
+        font-size: 18px !important;
+    }
+    
+    #question-screen .question-option {
+        padding: 10px !important;
+    }
+    
+    #question-screen .question-option i {
+        font-size: 14px !important;
+        min-width: 20px !important;
+    }
+    
+    #question-screen .question-option p {
+        font-size: 14px !important;
+    }
+    
+    /* Настройки для экрана результатов на очень узких экранах */
+    #result-screen {
+        padding: 15px 12px !important;
+    }
+    
+    #result-screen .screen-title {
+        font-size: 20px !important;
+    }
+    
+    #result-screen .card-image-container {
+        width: 120px !important;
+        height: 120px !important;
+    }
+}
+
+/* Фиксированные стили для основных экранов, чтобы гарантировать правильное отображение */
+#welcome-screen.active,
+#question-screen.active,
+#loading-screen.active,
+#result-screen.active {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+#welcome-screen.active {
+    display: flex !important;
+    flex-direction: column; /* Добавлено */
+    align-items: center;    /* Добавлено */
+    justify-content: center; /* Добавлено */
+    min-height: 60vh;       /* Добавлено */
+}
+
+#question-screen.active {
+    display: flex !important;
+}
+
+#loading-screen.active {
+    display: flex !important;
+}
+
+/* Гарантируем, что элементы на экране результатов всегда видны */
+#result-screen .prediction-container,
+#result-screen .prediction,
+#result-screen .action-buttons,
+#result-screen #prediction-text,
+#result-screen #card-title,
+#result-screen #result-card-image {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+    transition: none !important;
+}
+
+/* ... existing code ... */ 
+
+.main-container{
+    max-width: 100%;
+    min-height: 100vh;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    animation: fadeIn 0.8s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+    position: relative;
+    z-index: 1;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+/* Стили для экрана результата */
+#result-screen {
+  display: none;
+  padding: 25px;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+  border-radius: 15px;
+  background-color: rgba(20, 20, 40, 0.7);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#result-screen.active {
+  display: block;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.card-info {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.card-image-container {
+  width: 180px;
+  height: 280px;
+  margin: 0 auto 15px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+}
+
+#result-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.card-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--white);
+  margin: 15px 0;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.prediction-container {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.prediction {
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--white);
+  text-align: center;
+}
+
+#prediction-text {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.action-buttons {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 15px !important; /* Увеличиваем отступ между кнопками с 12px до 15px */
+  width: 100% !important;
+  margin: 20px auto !important;
+}
+
+.action-buttons button {
+  width: 100%;
+}
+
+/* Стили для экрана загрузки */
+#loading-screen {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 30px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  max-width: 100%;
+  width: 100%;
+  height: 100vh;
+  margin: 0 auto;
+  border-radius: 0;
+  background-color: rgba(10, 10, 20, 0.85);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: none;
+  z-index: 9999;
+}
+
+#loading-screen.active {
+  display: flex;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 80px;
+}
+
+.loader {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  border-top: 4px solid var(--primary-color);
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid var(--primary-color);
+  border-left: 4px solid transparent;
+  animation: loaderSpin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  box-shadow: 0 0 20px rgba(227, 6, 19, 0.3), 
+              inset 0 0 15px rgba(227, 6, 19, 0.2);
+  position: relative;
+  /* margin: 0 auto; <-- Удаляем эту строку */
+}
+
+.loader::before, 
+.loader::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+
+.loader::before {
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  border: 2px solid rgba(227, 6, 19, 0.2);
+  animation: loaderPulse 2s ease-out infinite;
+  opacity: 0;
+}
+
+.loader::after {
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  background-color: var(--primary-color);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px 2px rgba(227, 6, 19, 0.5);
+}
+
+@keyframes loaderSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes loaderPulse {
+  0% { transform: scale(1); opacity: 0; }
+  50% { opacity: 0.4; }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+
+/* Определение .loading-text и анимация spin перенесены */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Медиа-запросы для адаптивности */
+@media screen and (max-width: 480px) {
+  #result-screen {
+    padding: 20px 15px;
+  }
+  
+  .card-image-container {
+    width: 150px;
+    height: 230px;
+  }
+  
+  .card-title {
+    font-size: 20px;
+  }
+  
+  .prediction {
+    font-size: 16px;
+  }
+  
+  .action-buttons {
+  gap: 15px; /* Единый отступ между кнопками */
+  display: flex;
+  flex-direction: column;
+  max-width: 280px;
+  margin: 15px auto;
+  width: 100%;
+}
+}
+
+/* Стили для индикатора метода выбора карты */
+.selection-method-indicator {
+  text-align: center;
+  font-size: 14px;
+  font-style: italic;
+  opacity: 0.8;
+  margin-top: -5px;
+  margin-bottom: 15px;
+  padding: 5px 10px;
+  color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.selection-method-indicator.image-based {
+  color: #e3f2fd;
+  text-shadow: 0 0 5px rgba(33, 150, 243, 0.5);
+}
+
+.selection-method-indicator.random-based {
+  color: #fff8e1;
+  text-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
+}
+
+@media (max-width: 480px) {
+  .selection-method-indicator {
+    font-size: 12px;
+    margin-top: -3px;
+    margin-bottom: 10px;
+  }
+}
+
+/* ... existing code ... */
+.loading-text-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.loading-text {
+  font-size: 22px;
+  color: var(--white);
+  text-align: center;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  max-width: 80%;
+  margin: 0 auto;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  animation: textPulse 2s ease-in-out infinite;
+}
+
+.loading-dots {
+  display: flex;
+  justify-content: center;
+  margin-top: 5px;
+  height: 30px;
+}
+
+.dot {
+  font-size: 30px;
+  line-height: 20px;
+  color: var(--primary-color);
+  text-shadow: 0 0 10px rgba(227, 6, 19, 0.6);
+  animation: dotPulse 1.4s infinite;
+  opacity: 0;
+}
+
+.dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dotPulse {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  25% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  75% {
+    opacity: 1;
+    transform: translateY(3px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+}
+/* ... existing code ... */
+
+/* Специфичное правило для кнопок экрана результатов */
+#result-screen.result-screen .action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Фиксированный отступ между кнопками */
+  width: 100%;
+  max-width: 350px;
+  margin: 20px auto 15px;
+}
+
+@media (max-width: 480px) {
+  #result-screen.result-screen .action-buttons {
+    max-width: 280px;
+    gap: 15px;
+  }
+}
+
+document.getElementById('share-button').addEventListener('click', function() {
+    // Проверяем поддержку Web Share API
+    if (navigator.share) {
+        navigator.share({
+            title: document.getElementById('card-title').textContent,
+            text: document.getElementById('prediction-text').textContent,
+            url: window.location.href
+        })
+        .catch(error => console.error('Ошибка при попытке поделиться:', error));
+    } else {
+        // Если Web Share API не поддерживается, копируем в буфер обмена
+        const text = document.getElementById('prediction-text').textContent;
+        navigator.clipboard.writeText(text)
+            .then(() => alert('Предсказание скопировано в буфер обмена'))
+            .catch(err => console.error('Не удалось скопировать текст:', err));
+    }
+});
+
+console.log('Кнопки действий:', document.querySelector('.action-buttons'));
+console.log('Стили для кнопок:', getComputedStyle(document.querySelector('.action-buttons')));
+console.log('Кнопка поделиться:', document.getElementById('share-button'));
