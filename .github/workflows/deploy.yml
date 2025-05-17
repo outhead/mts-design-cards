@@ -2,7 +2,7 @@ name: Деплой на GitHub Pages
 
 on:
   push:
-    branches: [ master, gh-pages ]
+    branches: [ master, gh-pages, main ]
 
 jobs:
   deploy:
