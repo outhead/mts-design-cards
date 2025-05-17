@@ -895,14 +895,17 @@
         }
     </style>
     
+    <!-- Основные модули и утилиты -->
+    <script src="js/utils/logger.js"></script>
+    <script src="js/utils/eventBus.js"></script>
+    <script src="js/modules/statsModule.js"></script>
+    
     <!-- Основной файл приложения -->
     <script src="js/app-main.js"></script>
     
     <!-- Необходимые для админки скрипты -->
     <script src="js/admin.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- Остальные скрипты загружаются динамически через app-main.js -->
 </head>
 <body>
     <div class="admin-container">
@@ -1065,13 +1068,34 @@
             window.statsModule.init();
             console.log('Модуль статистики успешно инициализирован');
             
+            // Получаем актуальную статистику из модуля
+            const stats = window.statsModule.getStats();
+            
+            // Обновляем отображаемые значения
+            setTimeout(function() {
+                // Обновляем элементы отображения статистики
+                const elements = {
+                    totalUsers: document.getElementById('total-users'),
+                    totalPredictions: document.getElementById('total-predictions'),
+                    todayPredictions: document.getElementById('today-predictions'),
+                    totalShares: document.getElementById('total-shares')
+                };
+                
+                if (elements.totalUsers) elements.totalUsers.textContent = stats.totalUsers || '0';
+                if (elements.totalPredictions) elements.totalPredictions.textContent = stats.totalPredictions || '0';
+                if (elements.todayPredictions) elements.todayPredictions.textContent = stats.todayPredictions || '0';
+                if (elements.totalShares) elements.totalShares.textContent = stats.shares || '0';
+                
+                console.log('Отображение статистики обновлено из модуля statsModule:', stats);
+            }, 500);
+            
             // Явно вызываем пересчет пользователей
             if (typeof window.statsModule.countRegisteredUsers === 'function') {
                 setTimeout(function() {
                     console.log('Запуск пересчета количества пользователей...');
                     const userCount = window.statsModule.countRegisteredUsers();
                     console.log('Пересчет пользователей завершен, текущее количество:', userCount);
-                }, 500);
+                }, 1000);
             }
         }
         
@@ -1082,8 +1106,48 @@
             if (refreshStatsBtn) {
                 refreshStatsBtn.addEventListener('click', function() {
                     if (window.refreshStats) window.refreshStats();
+                    
+                    // Также вызываем обновление из модуля statsModule
+                    if (window.statsModule && typeof window.statsModule.getStats === 'function') {
+                        const stats = window.statsModule.getStats();
+                        
+                        // Обновляем элементы отображения статистики
+                        const elements = {
+                            totalUsers: document.getElementById('total-users'),
+                            totalPredictions: document.getElementById('total-predictions'),
+                            todayPredictions: document.getElementById('today-predictions'),
+                            totalShares: document.getElementById('total-shares')
+                        };
+                        
+                        if (elements.totalUsers) elements.totalUsers.textContent = stats.totalUsers || '0';
+                        if (elements.totalPredictions) elements.totalPredictions.textContent = stats.totalPredictions || '0';
+                        if (elements.todayPredictions) elements.todayPredictions.textContent = stats.todayPredictions || '0';
+                        if (elements.totalShares) elements.totalShares.textContent = stats.shares || '0';
+                        
+                        console.log('Отображение статистики обновлено по клику на кнопку refresh:', stats);
+                    }
                 });
             }
+            
+            // Добавляем обработчик события обновления статистики
+            window.addEventListener('stats-updated', function(event) {
+                if (event.detail) {
+                    // Обновляем элементы отображения статистики
+                    const elements = {
+                        totalUsers: document.getElementById('total-users'),
+                        totalPredictions: document.getElementById('total-predictions'),
+                        todayPredictions: document.getElementById('today-predictions'),
+                        totalShares: document.getElementById('total-shares')
+                    };
+                    
+                    if (elements.totalUsers) elements.totalUsers.textContent = event.detail.totalUsers || '0';
+                    if (elements.totalPredictions) elements.totalPredictions.textContent = event.detail.totalPredictions || '0';
+                    if (elements.todayPredictions) elements.todayPredictions.textContent = event.detail.todayPredictions || '0';
+                    if (elements.totalShares) elements.totalShares.textContent = event.detail.shares || '0';
+                    
+                    console.log('Обновление статистики получено через событие stats-updated:', event.detail);
+                }
+            });
         });
     </script>
     <!-- Админ-скрипты и библиотеки уже подключены в head -->
