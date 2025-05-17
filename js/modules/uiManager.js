@@ -419,8 +419,8 @@ function displayCard(cardKey, cardData, selectionMethod = 'image') {
     fullscreenCardTitle.textContent = cardTitle;
   }
   
-  // Используем настоящие PNG файлы карт из папки img/cards
-  const cardImagePath = `img/cards/${cardKey}.png`;
+  // Используем настоящие файлы карт из папки img/cards (поддержка WebP вместо PNG)
+  const cardImagePath = `img/cards/${cardKey}.webp`;
   
   // Встроенное Base64 изображение как запасной вариант
   const fallbackImage = 'data:image/png;base64,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';
@@ -488,6 +488,9 @@ function setupCardPreview() {
             if (fullscreenImage && cardImage) {
                 fullscreenImage.src = cardImage.src;
             }
+            
+            // Обновляем регулярное выражение для распознавания карт в формате WebP
+            const cardMatch = cardImage.src.match(/card(\d+)\.webp/);
             
             if (fullscreenTitle && predictionTitle) {
                 fullscreenTitle.textContent = predictionTitle.textContent;
@@ -628,7 +631,7 @@ function sendFeedbackToStats(value) {
   // Определяем ID карты из URL изображения
   let cardId = 'unknown';
   if (cardImage) {
-    const cardMatch = cardImage.match(/card(\d+)\.png/);
+    const cardMatch = cardImage.match(/card(\d+)\.webp/);
     if (cardMatch && cardMatch[1]) {
       cardId = cardMatch[1];
     }
