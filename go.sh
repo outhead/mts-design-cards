@@ -1,22 +1,23 @@
 #!/bin/bash
 
-echo -e "\033[32mНачинаем автоматическую публикацию...\033[0m"
+echo "========================================"
+echo "Запуск локального PHP-сервера для MTS Design Cards"
+echo "========================================"
 
-# Добавляем все изменения
-git add .
+# Проверяем наличие PHP в системе
+if ! command -v php &> /dev/null; then
+    echo "[ОШИБКА] PHP не найден в системе. Пожалуйста, установите PHP."
+    echo "Для Ubuntu/Debian: sudo apt install php"
+    echo "Для MacOS: brew install php"
+    echo "========================================"
+    exit 1
+fi
 
-# Запрашиваем сообщение коммита
-echo -e "Message for commit: \c"
-read commit_message
+echo "[ЗАПУСК] Локальный сервер запускается на порту 8000..."
+echo "[ДОСТУП] http://localhost:8000"
+echo "[CTRL+C] для остановки сервера"
+echo "========================================"
 
-# Коммитим с сообщением
-git commit -m "$commit_message"
+php -S localhost:8000
 
-# Определяем имя текущей ветки
-current_branch=$(git symbolic-ref --short HEAD)
-
-# Отправляем изменения
-git push origin $current_branch
-
-echo -e "\033[32mSucces commit GitHub!\033[0m"
-echo -e "\033[36mcheck deploy in Actions: https://github.com/outhead/mts-design-cards/actions\033[0m" 
+echo "[СТОП] Сервер остановлен" 

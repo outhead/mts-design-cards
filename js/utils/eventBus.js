@@ -27,6 +27,21 @@ const EventBus = (function() {
         };
     }
     
+    // Отдельный метод для отписки от события
+    function unsubscribe(event, callback) {
+        if (!subscribers[event]) {
+            return false;
+        }
+        
+        const index = subscribers[event].indexOf(callback);
+        if (index !== -1) {
+            subscribers[event].splice(index, 1);
+            return true;
+        }
+        
+        return false;
+    }
+    
     // Публикация события с данными
     function publish(event, data) {
         if (!subscribers[event]) {
@@ -63,6 +78,7 @@ const EventBus = (function() {
     // Публичный API
     return {
         subscribe,
+        unsubscribe,
         publish,
         clear,
         getSubscribers

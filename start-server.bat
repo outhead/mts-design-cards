@@ -1,11 +1,25 @@
 @echo off
-echo Запуск http-server в фоновом режиме...
-start /B npx http-server
-echo Сервер запущен!
-echo.
-echo Сервер доступен по адресам:
-echo   http://127.0.0.1:8080
-echo   http://localhost:8080
-echo.
-echo Для остановки сервера запустите stop-server.bat
-echo. 
+echo ========================================
+echo Запуск локального PHP-сервера для MTS Design Cards
+echo ========================================
+
+REM Проверяем наличие PHP в системе
+where php >nul 2>nul
+if %ERRORLEVEL% neq 0 (
+    echo [ОШИБКА] PHP не найден в системе. Пожалуйста, установите PHP.
+    echo Скачать PHP можно с сайта: https://windows.php.net/download/
+    echo После установки добавьте PHP в PATH или укажите полный путь к PHP в этом файле.
+    echo ========================================
+    pause
+    exit /b 1
+)
+
+echo [ЗАПУСК] Локальный сервер запускается на порту 8000...
+echo [ДОСТУП] http://localhost:8000
+echo [CTRL+C] для остановки сервера
+echo ========================================
+
+php -S localhost:8000
+
+echo [СТОП] Сервер остановлен
+pause 

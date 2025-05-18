@@ -187,6 +187,62 @@
         .form-actions {
             display: flex;
             gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        /* Добавляем новые стили для импорта/экспорта */
+        .import-export-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .import-export-section h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: var(--white);
+            font-size: 20px;
+        }
+        
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        
+        .file-upload input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 2;
+        }
+        
+        .file-upload-label {
+            display: inline-block;
+            padding: 12px 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .file-upload:hover .file-upload-label {
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+        }
+        
+        .file-name {
+            margin-left: 10px;
+            font-size: 14px;
+            color: var(--dark-gray);
         }
         
         @keyframes fadeIn {
@@ -196,15 +252,16 @@
     </style>
     
     <!-- Основные модули и утилиты -->
-    <script src="js/utils/logger.js"></script>
-    <script src="js/utils/eventBus.js"></script>
-    <script src="js/modules/statsModule.js"></script>
+    <script src="js/utils/logger.js?v=3"></script>
+    <script src="js/utils/eventBus.js?v=3"></script>
+    <script src="js/utils/configManager.js?v=3"></script>
+    <script src="js/modules/statsModule.js?v=3"></script>
     
     <!-- Основной файл приложения -->
-    <script src="js/app-main.js"></script>
+    <script src="js/app-main.js?v=3"></script>
     
     <!-- Подключаем модуль API -->
-    <script src="js/modules/apiModule.js"></script>
+    <script src="js/modules/apiModule.js?v=3"></script>
 </head>
 <body>
     <div class="admin-container">
@@ -253,6 +310,22 @@
                         <button type="button" id="test-api-btn" class="btn btn-secondary">Проверить API</button>
                     </div>
                 </form>
+                
+                <!-- Добавляем секцию для импорта/экспорта -->
+                <div class="import-export-section">
+                    <h3>Импорт/Экспорт настроек</h3>
+                    <p>Для использования на статических хостингах (Cloudflare Pages, GitHub Pages) вы можете экспортировать настройки в файл и импортировать их позже.</p>
+                    
+                    <div class="form-actions">
+                        <button type="button" id="export-config-btn" class="btn btn-secondary">Экспорт настроек</button>
+                        
+                        <div class="file-upload">
+                            <input type="file" id="import-config-file" accept=".json">
+                            <label for="import-config-file" class="file-upload-label">Импорт настроек</label>
+                        </div>
+                        <span id="file-name" class="file-name"></span>
+                    </div>
+                </div>
             </div>
             
             <div id="api-test-result" class="card-item" style="display: none; margin-top: 20px;">
@@ -277,6 +350,9 @@
             const statusMessage = document.getElementById('status-message');
             const apiTestResult = document.getElementById('api-test-result');
             const apiTestContent = document.getElementById('api-test-content');
+            const exportConfigBtn = document.getElementById('export-config-btn');
+            const importConfigFile = document.getElementById('import-config-file');
+            const fileNameDisplay = document.getElementById('file-name');
             
             // Обновление значения температуры при изменении ползунка
             apiTemperature.addEventListener('input', function() {
@@ -285,36 +361,42 @@
             
             // Функция для загрузки конфигурации
             function loadConfig() {
-                // Предпочитаем использовать глобальную конфигурацию
-                if (window.APP_CONFIG) {
+                let config;
+                
+                // Используем ConfigManager, если доступен
+                if (window.ConfigManager && typeof window.ConfigManager.loadConfig === 'function') {
+                    config = window.ConfigManager.loadConfig();
+                    console.log('Загрузка настроек через ConfigManager');
+                } 
+                // Если нет ConfigManager, используем старые методы
+                else if (window.APP_CONFIG) {
                     console.log('Загрузка настроек из глобальной конфигурации');
-                    apiBaseUrl.value = window.APP_CONFIG.apiBaseUrl || '';
-                    apiKey.value = window.APP_CONFIG.apiKey || '';
-                    apiModel.value = window.APP_CONFIG.apiModel || 'gpt-3.5-turbo';
-                    apiTemperature.value = window.APP_CONFIG.temperature || 0.7;
-                    tempValue.textContent = apiTemperature.value;
-                    apiEnabled.checked = window.APP_CONFIG.isApiEnabled || false;
-                    systemPrompt.value = window.APP_CONFIG.systemPrompt || '';
+                    config = window.APP_CONFIG;
                 } else if (window.apiModule) {
                     console.log('Загрузка настроек из модуля API');
-                    const settings = window.apiModule.getSettings();
-                    apiBaseUrl.value = settings.apiBaseUrl || '';
-                    apiKey.value = window.localStorage.getItem('gptApiKey') || '';
-                    apiModel.value = settings.model || 'gpt-3.5-turbo';
-                    apiTemperature.value = settings.temperature || 0.7;
-                    tempValue.textContent = apiTemperature.value;
-                    apiEnabled.checked = settings.isEnabled || false;
-                    systemPrompt.value = settings.systemPromptTemplate || '';
+                    config = window.apiModule.getSettings();
                 } else {
                     console.log('Загрузка настроек из localStorage');
-                    apiBaseUrl.value = window.localStorage.getItem('apiBaseUrl') || 'https://api.openai.com/v1';
-                    apiKey.value = window.localStorage.getItem('gptApiKey') || '';
-                    apiModel.value = window.localStorage.getItem('gptModel') || 'gpt-3.5-turbo';
-                    apiTemperature.value = window.localStorage.getItem('gptTemperature') || 0.7;
-                    tempValue.textContent = apiTemperature.value;
-                    apiEnabled.checked = window.localStorage.getItem('isGptEnabled') === 'true';
-                    systemPrompt.value = window.localStorage.getItem('gptPrompt') || '';
+                    config = {
+                        apiBaseUrl: window.localStorage.getItem('apiBaseUrl') || 'https://api.openai.com/v1',
+                        apiKey: window.localStorage.getItem('gptApiKey') || '',
+                        apiModel: window.localStorage.getItem('gptModel') || 'gpt-3.5-turbo',
+                        temperature: parseFloat(window.localStorage.getItem('gptTemperature')) || 0.7,
+                        isApiEnabled: window.localStorage.getItem('isGptEnabled') === 'true',
+                        systemPromptTemplate: window.localStorage.getItem('gptPrompt') || ''
+                    };
                 }
+                
+                // Заполняем форму данными
+                apiBaseUrl.value = config.apiBaseUrl || '';
+                apiKey.value = config.apiKey || '';
+                apiModel.value = config.apiModel || 'gpt-3.5-turbo';
+                apiTemperature.value = config.temperature || 0.7;
+                tempValue.textContent = apiTemperature.value;
+                apiEnabled.checked = config.isApiEnabled || false;
+                systemPrompt.value = config.systemPromptTemplate || config.systemPrompt || '';
+                
+                console.log('Настройки загружены: API ' + (config.isApiEnabled ? 'включен' : 'отключен'));
             }
             
             // Функция для сохранения конфигурации
@@ -326,59 +408,66 @@
                     apiModel: apiModel.value,
                     temperature: parseFloat(apiTemperature.value),
                     isApiEnabled: apiEnabled.checked,
-                    systemPrompt: systemPrompt.value,
+                    systemPromptTemplate: systemPrompt.value,
+                    systemPrompt: systemPrompt.value, // Для совместимости 
                     lastUpdated: new Date().toISOString()
                 };
                 
-                // Сохраняем настройки в localStorage
-                localStorage.setItem('apiBaseUrl', config.apiBaseUrl);
-                localStorage.setItem('gptApiKey', config.apiKey);
-                localStorage.setItem('gptModel', config.apiModel);
-                localStorage.setItem('gptTemperature', config.temperature);
-                localStorage.setItem('isGptEnabled', config.isApiEnabled);
-                localStorage.setItem('gptPrompt', config.systemPrompt);
-                localStorage.setItem('openai_system_prompt', config.systemPrompt);
+                // Показываем информацию о процессе сохранения
+                showStatus('Сохранение настроек...', 'warning');
                 
-                // Обновляем глобальную конфигурацию
-                if (window.APP_CONFIG) {
-                    window.APP_CONFIG = { ...window.APP_CONFIG, ...config };
-                } else {
-                    window.APP_CONFIG = config;
-                }
-                
-                // Обновляем настройки в модуле API
-                if (window.apiModule && typeof window.apiModule.updateSettings === 'function') {
-                    window.apiModule.updateSettings({
-                        apiKey: config.apiKey,
-                        isEnabled: config.isApiEnabled,
-                        model: config.apiModel,
-                        temperature: config.temperature,
-                        systemPromptTemplate: config.systemPrompt,
-                        apiBaseUrl: config.apiBaseUrl
-                    });
-                }
-                
-                // Отправляем запрос на сохранение в файл
-                fetch('save-config.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(config)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
+                // Используем ConfigManager, если доступен
+                if (window.ConfigManager && typeof window.ConfigManager.saveConfig === 'function') {
+                    const result = window.ConfigManager.saveConfig(config);
+                    if (result) {
+                        showStatus('Настройки успешно сохранены', 'success');
+                        console.log('Настройки сохранены через ConfigManager');
+                    } else {
+                        showStatus('Ошибка при сохранении настроек', 'error');
+                    }
+                } 
+                // Если ConfigManager недоступен, используем старые методы
+                else {
+                    // Сохраняем настройки в localStorage
+                    localStorage.setItem('apiBaseUrl', config.apiBaseUrl);
+                    localStorage.setItem('gptApiKey', config.apiKey);
+                    localStorage.setItem('gptModel', config.apiModel);
+                    localStorage.setItem('gptTemperature', config.temperature);
+                    localStorage.setItem('isGptEnabled', config.isApiEnabled);
+                    localStorage.setItem('gptPrompt', config.systemPromptTemplate);
+                    localStorage.setItem('openai_system_prompt', config.systemPromptTemplate);
+                    
+                    // Обновляем глобальную конфигурацию
+                    if (window.APP_CONFIG) {
+                        window.APP_CONFIG = { ...window.APP_CONFIG, ...config };
+                    } else {
+                        window.APP_CONFIG = config;
+                    }
+                    
+                    // Обновляем настройки в модуле API
+                    if (window.apiModule && typeof window.apiModule.updateSettings === 'function') {
+                        window.apiModule.updateSettings({
+                            apiKey: config.apiKey,
+                            isEnabled: config.isApiEnabled,
+                            model: config.apiModel,
+                            temperature: config.temperature,
+                            systemPromptTemplate: config.systemPromptTemplate,
+                            apiBaseUrl: config.apiBaseUrl
+                        });
+                        
                         showStatus('Настройки успешно сохранены', 'success');
                     } else {
-                        showStatus('Ошибка при сохранении настроек: ' + data.message, 'error');
-                        console.error('Ошибка при сохранении конфигурации:', data.message);
+                        showStatus('Настройки сохранены только в браузере', 'warning');
                     }
-                })
-                .catch(error => {
-                    showStatus('Ошибка при отправке запроса на сервер. Настройки сохранены только локально.', 'warning');
-                    console.error('Ошибка при отправке запроса:', error);
-                });
+                }
+                
+                // Публикуем событие о сохранении настроек
+                if (window.EventBus && typeof window.EventBus.publish === 'function') {
+                    window.EventBus.publish('API_SETTINGS_UPDATED', {
+                        config: config,
+                        timestamp: new Date().toISOString()
+                    });
+                }
             }
             
             // Функция для отображения статусных сообщений
@@ -461,6 +550,150 @@
                 }
             }
             
+            // Обработчик экспорта настроек
+            function handleExportConfig() {
+                if (window.ConfigManager && typeof window.ConfigManager.exportConfig === 'function') {
+                    const result = window.ConfigManager.exportConfig();
+                    if (result) {
+                        showStatus('Настройки экспортированы', 'success');
+                    } else {
+                        showStatus('Ошибка при экспорте настроек', 'error');
+                    }
+                } else {
+                    // Используем встроенный механизм экспорта
+                    try {
+                        // Собираем настройки 
+                        const config = {
+                            apiBaseUrl: apiBaseUrl.value,
+                            apiKey: window.confirm('Включить API ключ в экспортируемую конфигурацию?') ? apiKey.value : '',
+                            apiModel: apiModel.value,
+                            temperature: parseFloat(apiTemperature.value),
+                            isApiEnabled: apiEnabled.checked,
+                            systemPromptTemplate: systemPrompt.value,
+                            systemPrompt: systemPrompt.value,
+                            lastUpdated: new Date().toISOString()
+                        };
+                        
+                        // Создаем файл для скачивания
+                        const configString = JSON.stringify(config, null, 2);
+                        const blob = new Blob([configString], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        
+                        // Создаем ссылку и имитируем клик
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'mts-design-cards-config.json';
+                        document.body.appendChild(a);
+                        a.click();
+                        
+                        // Очистка
+                        setTimeout(() => {
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                        }, 100);
+                        
+                        showStatus('Настройки экспортированы', 'success');
+                    } catch (error) {
+                        console.error('Ошибка при экспорте конфигурации:', error);
+                        showStatus('Ошибка при экспорте настроек', 'error');
+                    }
+                }
+            }
+            
+            // Обработчик импорта настроек
+            function handleImportConfigFile(event) {
+                const file = event.target.files[0];
+                
+                if (!file) {
+                    showStatus('Файл не выбран', 'error');
+                    return;
+                }
+                
+                fileNameDisplay.textContent = file.name;
+                
+                // Используем ConfigManager, если доступен
+                if (window.ConfigManager && typeof window.ConfigManager.importConfig === 'function') {
+                    window.ConfigManager.importConfig(file)
+                        .then(result => {
+                            showStatus('Настройки успешно импортированы', 'success');
+                            loadConfig(); // Перезагружаем форму
+                        })
+                        .catch(error => {
+                            showStatus('Ошибка при импорте настроек: ' + error.message, 'error');
+                        });
+                } else {
+                    // Используем встроенный механизм импорта
+                    try {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(e) {
+                            try {
+                                const config = JSON.parse(e.target.result);
+                                
+                                // Проверяем, что конфигурация корректна
+                                if (!config.apiBaseUrl || !config.apiModel) {
+                                    showStatus('Некорректный формат конфигурации', 'error');
+                                    return;
+                                }
+                                
+                                // Сохраняем настройки в localStorage
+                                localStorage.setItem('apiBaseUrl', config.apiBaseUrl || '');
+                                localStorage.setItem('gptApiKey', config.apiKey || '');
+                                localStorage.setItem('gptModel', config.apiModel || 'gpt-3.5-turbo');
+                                localStorage.setItem('gptTemperature', config.temperature || 0.7);
+                                localStorage.setItem('isGptEnabled', config.isApiEnabled || false);
+                                localStorage.setItem('gptPrompt', config.systemPromptTemplate || config.systemPrompt || '');
+                                localStorage.setItem('openai_system_prompt', config.systemPromptTemplate || config.systemPrompt || '');
+                                
+                                // Обновляем глобальную конфигурацию
+                                if (window.APP_CONFIG) {
+                                    window.APP_CONFIG = { ...window.APP_CONFIG, ...config };
+                                } else {
+                                    window.APP_CONFIG = config;
+                                }
+                                
+                                // Обновляем настройки в модуле API
+                                if (window.apiModule && typeof window.apiModule.updateSettings === 'function') {
+                                    window.apiModule.updateSettings({
+                                        apiKey: config.apiKey,
+                                        isEnabled: config.isApiEnabled,
+                                        model: config.apiModel,
+                                        temperature: config.temperature,
+                                        systemPromptTemplate: config.systemPromptTemplate || config.systemPrompt,
+                                        apiBaseUrl: config.apiBaseUrl
+                                    });
+                                }
+                                
+                                showStatus('Настройки успешно импортированы', 'success');
+                                
+                                // Перезагружаем форму
+                                loadConfig();
+                                
+                                // Публикуем событие об импорте настроек
+                                if (window.EventBus && typeof window.EventBus.publish === 'function') {
+                                    window.EventBus.publish('CONFIG_IMPORTED', {
+                                        success: true,
+                                        timestamp: new Date().toISOString()
+                                    });
+                                }
+                            } catch (error) {
+                                console.error('Ошибка при обработке файла:', error);
+                                showStatus('Ошибка при обработке файла конфигурации', 'error');
+                            }
+                        };
+                        
+                        reader.onerror = function() {
+                            showStatus('Ошибка при чтении файла', 'error');
+                        };
+                        
+                        reader.readAsText(file);
+                    } catch (error) {
+                        console.error('Ошибка при импорте конфигурации:', error);
+                        showStatus('Ошибка при импорте настроек', 'error');
+                    }
+                }
+            }
+            
             // Обработчик отправки формы
             form.addEventListener('submit', function(event) {
                 event.preventDefault();
@@ -472,9 +705,55 @@
                 testApi();
             });
             
+            // Обработчик кнопки экспорта
+            exportConfigBtn.addEventListener('click', function() {
+                handleExportConfig();
+            });
+            
+            // Обработчик выбора файла для импорта
+            importConfigFile.addEventListener('change', function(event) {
+                handleImportConfigFile(event);
+            });
+            
+            // Подписываемся на события ConfigManager
+            if (window.EventBus && typeof window.EventBus.subscribe === 'function') {
+                // Сохранение конфигурации
+                window.EventBus.subscribe('CONFIG_SAVED', function(data) {
+                    if (data.success) {
+                        showStatus('Настройки успешно сохранены', 'success');
+                    }
+                });
+                
+                // Ошибка при сохранении
+                window.EventBus.subscribe('CONFIG_SAVE_ERROR', function(data) {
+                    showStatus(data.message || 'Ошибка при сохранении настроек', 'error');
+                });
+                
+                // Импорт конфигурации
+                window.EventBus.subscribe('CONFIG_IMPORTED', function(data) {
+                    if (data.success) {
+                        showStatus('Настройки успешно импортированы', 'success');
+                        loadConfig(); // Перезагружаем форму
+                    }
+                });
+            }
+            
             // Загружаем конфигурацию при загрузке страницы
             loadConfig();
         });
+        
+        // Проверяем и используем новый механизм сохранения
+        if (window.ConfigManager && typeof window.ConfigManager.saveConfig === 'function') {
+            console.log('Новый ConfigManager найден и будет использоваться');
+            if (window.apiModule) {
+                window.apiModule.saveConfigToFile = function() {
+                    console.log('Старый метод saveConfigToFile перехвачен, используется ConfigManager');
+                    return window.ConfigManager.saveConfig(window.APP_CONFIG);
+                };
+            }
+        } else {
+            console.error('ConfigManager не найден, сохранение может не работать корректно');
+        }
     </script>
 </body>
 </html> 
