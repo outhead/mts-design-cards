@@ -9,6 +9,65 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('MTS Design Weekend - Карты предсказаний v2.0');
     
+    // Функция для загрузки конфигурации из config.json
+    async function loadConfig() {
+        try {
+            // Добавляем параметр времени для предотвращения кэширования
+            const timestamp = new Date().getTime();
+            const response = await fetch(`config.json?v=${timestamp}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const config = await response.json();
+            console.log('Конфигурация успешно загружена из config.json');
+            
+            // Создаем глобальную переменную для хранения конфигурации
+            window.APP_CONFIG = config;
+            
+            // Обновляем локальные настройки API, если они есть в конфиге
+            if (config.apiKey) {
+                localStorage.setItem('gptApiKey', config.apiKey);
+            }
+            
+            if (config.isApiEnabled !== undefined) {
+                localStorage.setItem('isGptEnabled', config.isApiEnabled.toString());
+            }
+            
+            if (config.apiModel) {
+                localStorage.setItem('gptModel', config.apiModel);
+            }
+            
+            if (config.temperature) {
+                localStorage.setItem('gptTemperature', config.temperature.toString());
+            }
+            
+            if (config.systemPrompt) {
+                localStorage.setItem('gptPrompt', config.systemPrompt);
+                localStorage.setItem('openai_system_prompt', config.systemPrompt);
+            }
+            
+            return config;
+        } catch (error) {
+            console.warn('Ошибка при загрузке конфигурации из config.json:', error);
+            console.warn('Используем локальные или дефолтные настройки');
+            
+            // Используем настройки из localStorage, если они есть
+            const localConfig = {
+                apiBaseUrl: localStorage.getItem('apiBaseUrl') || 'https://api.openai.com/v1',
+                apiKey: localStorage.getItem('gptApiKey') || '',
+                apiModel: localStorage.getItem('gptModel') || 'gpt-3.5-turbo',
+                isApiEnabled: localStorage.getItem('isGptEnabled') === 'true' || false,
+                temperature: parseFloat(localStorage.getItem('gptTemperature') || '0.7'),
+                systemPrompt: localStorage.getItem('gptPrompt') || localStorage.getItem('openai_system_prompt') || ''
+            };
+            
+            window.APP_CONFIG = localConfig;
+            return localConfig;
+        }
+    }
+    
     // Конфигурация модулей
     const modules = [
         // Утилиты и сервисы - загружаются первыми
@@ -140,6 +199,12 @@ document.addEventListener('DOMContentLoaded', function() {
             // Отображаем индикатор загрузки или начальный экран
             showLoadingIndicator(true);
             
+            // Сначала загружаем конфигурацию
+            console.log('Загрузка конфигурации...');
+            await loadConfig();
+            console.log('Конфигурация загружена, APP_CONFIG:', window.APP_CONFIG);
+            
+            // Затем загружаем модули
             for (const module of modules) {
                 await loadModule(module);
             }

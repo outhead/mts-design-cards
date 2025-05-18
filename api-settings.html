@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Настройки API | MTS Design Weekend</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .admin-card {
+            background-color: var(--glassmorphism);
+            border-radius: var(--card-radius);
+            padding: 30px;
+            margin-bottom: 30px;
+            border: var(--glassmorphism-border);
+            box-shadow: var(--glassmorphism-shadow);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .admin-card:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+        }
+        
+        .admin-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .admin-heading h2 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--white);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(227, 6, 19, 0.25);
+            background-color: rgba(255, 255, 255, 0.07);
+        }
+        
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            border: none;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+        }
+        
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 15px rgba(227, 6, 19, 0.3);
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 8px 20px rgba(227, 6, 19, 0.4);
+        }
+        
+        .btn-secondary {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+        }
+        
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .card-item {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 25px;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            transition: box-shadow 0.3s ease, background-color 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .card-item:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .back-link {
+            color: var(--white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        
+        .back-link:hover {
+            opacity: 1;
+        }
+        
+        .status-message {
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .status-success {
+            background-color: rgba(39, 174, 96, 0.2);
+            border: 1px solid rgba(39, 174, 96, 0.4);
+            color: #2ecc71;
+        }
+        
+        .status-error {
+            background-color: rgba(231, 76, 60, 0.2);
+            border: 1px solid rgba(231, 76, 60, 0.4);
+            color: #e74c3c;
+        }
+        
+        .status-warning {
+            background-color: rgba(243, 156, 18, 0.2);
+            border: 1px solid rgba(243, 156, 18, 0.4);
+            color: #f39c12;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    
+    <!-- Основные модули и утилиты -->
+    <script src="js/utils/logger.js"></script>
+    <script src="js/utils/eventBus.js"></script>
+    <script src="js/modules/statsModule.js"></script>
+    
+    <!-- Основной файл приложения -->
+    <script src="js/app-main.js"></script>
+    
+    <!-- Подключаем модуль API -->
+    <script src="js/modules/apiModule.js"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <a href="admin.html" class="back-link">← Вернуться в панель администратора</a>
+        
+        <div class="admin-card">
+            <div class="admin-heading">
+                <h2>Настройки API</h2>
+            </div>
+            
+            <div id="status-message" class="status-message"></div>
+            
+            <div class="card-item">
+                <form id="api-config-form">
+                    <div class="form-group">
+                        <label for="api-base-url">API URL</label>
+                        <input type="text" id="api-base-url" class="form-control" placeholder="https://api.openai.com/v1">
+                    </div>
+                    <div class="form-group">
+                        <label for="api-key">API Ключ</label>
+                        <input type="password" id="api-key" class="form-control" placeholder="Ваш API ключ">
+                    </div>
+                    <div class="form-group">
+                        <label for="api-model">Модель</label>
+                        <select id="api-model" class="form-control">
+                            <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                            <option value="gpt-4">GPT-4</option>
+                            <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="api-temperature">Температура (креативность) <span id="temp-value">0.7</span></label>
+                        <input type="range" id="api-temperature" class="form-control" min="0" max="1" step="0.1" value="0.7">
+                    </div>
+                    <div class="form-group">
+                        <label for="api-enabled">
+                            <input type="checkbox" id="api-enabled"> Включить API
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="system-prompt">Системный промпт</label>
+                        <textarea id="system-prompt" class="form-control" rows="8" placeholder="Шаблон системного промпта для генерации предсказаний"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Сохранить настройки</button>
+                        <button type="button" id="test-api-btn" class="btn btn-secondary">Проверить API</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div id="api-test-result" class="card-item" style="display: none; margin-top: 20px;">
+                <h3>Результат проверки API</h3>
+                <div id="api-test-content"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Получение ссылок на элементы формы
+            const form = document.getElementById('api-config-form');
+            const apiBaseUrl = document.getElementById('api-base-url');
+            const apiKey = document.getElementById('api-key');
+            const apiModel = document.getElementById('api-model');
+            const apiTemperature = document.getElementById('api-temperature');
+            const tempValue = document.getElementById('temp-value');
+            const apiEnabled = document.getElementById('api-enabled');
+            const systemPrompt = document.getElementById('system-prompt');
+            const testApiBtn = document.getElementById('test-api-btn');
+            const statusMessage = document.getElementById('status-message');
+            const apiTestResult = document.getElementById('api-test-result');
+            const apiTestContent = document.getElementById('api-test-content');
+            
+            // Обновление значения температуры при изменении ползунка
+            apiTemperature.addEventListener('input', function() {
+                tempValue.textContent = this.value;
+            });
+            
+            // Функция для загрузки конфигурации
+            function loadConfig() {
+                // Предпочитаем использовать глобальную конфигурацию
+                if (window.APP_CONFIG) {
+                    console.log('Загрузка настроек из глобальной конфигурации');
+                    apiBaseUrl.value = window.APP_CONFIG.apiBaseUrl || '';
+                    apiKey.value = window.APP_CONFIG.apiKey || '';
+                    apiModel.value = window.APP_CONFIG.apiModel || 'gpt-3.5-turbo';
+                    apiTemperature.value = window.APP_CONFIG.temperature || 0.7;
+                    tempValue.textContent = apiTemperature.value;
+                    apiEnabled.checked = window.APP_CONFIG.isApiEnabled || false;
+                    systemPrompt.value = window.APP_CONFIG.systemPrompt || '';
+                } else if (window.apiModule) {
+                    console.log('Загрузка настроек из модуля API');
+                    const settings = window.apiModule.getSettings();
+                    apiBaseUrl.value = settings.apiBaseUrl || '';
+                    apiKey.value = window.localStorage.getItem('gptApiKey') || '';
+                    apiModel.value = settings.model || 'gpt-3.5-turbo';
+                    apiTemperature.value = settings.temperature || 0.7;
+                    tempValue.textContent = apiTemperature.value;
+                    apiEnabled.checked = settings.isEnabled || false;
+                    systemPrompt.value = settings.systemPromptTemplate || '';
+                } else {
+                    console.log('Загрузка настроек из localStorage');
+                    apiBaseUrl.value = window.localStorage.getItem('apiBaseUrl') || 'https://api.openai.com/v1';
+                    apiKey.value = window.localStorage.getItem('gptApiKey') || '';
+                    apiModel.value = window.localStorage.getItem('gptModel') || 'gpt-3.5-turbo';
+                    apiTemperature.value = window.localStorage.getItem('gptTemperature') || 0.7;
+                    tempValue.textContent = apiTemperature.value;
+                    apiEnabled.checked = window.localStorage.getItem('isGptEnabled') === 'true';
+                    systemPrompt.value = window.localStorage.getItem('gptPrompt') || '';
+                }
+            }
+            
+            // Функция для сохранения конфигурации
+            function saveConfig() {
+                // Собираем настройки из формы
+                const config = {
+                    apiBaseUrl: apiBaseUrl.value,
+                    apiKey: apiKey.value,
+                    apiModel: apiModel.value,
+                    temperature: parseFloat(apiTemperature.value),
+                    isApiEnabled: apiEnabled.checked,
+                    systemPrompt: systemPrompt.value,
+                    lastUpdated: new Date().toISOString()
+                };
+                
+                // Сохраняем настройки в localStorage
+                localStorage.setItem('apiBaseUrl', config.apiBaseUrl);
+                localStorage.setItem('gptApiKey', config.apiKey);
+                localStorage.setItem('gptModel', config.apiModel);
+                localStorage.setItem('gptTemperature', config.temperature);
+                localStorage.setItem('isGptEnabled', config.isApiEnabled);
+                localStorage.setItem('gptPrompt', config.systemPrompt);
+                localStorage.setItem('openai_system_prompt', config.systemPrompt);
+                
+                // Обновляем глобальную конфигурацию
+                if (window.APP_CONFIG) {
+                    window.APP_CONFIG = { ...window.APP_CONFIG, ...config };
+                } else {
+                    window.APP_CONFIG = config;
+                }
+                
+                // Обновляем настройки в модуле API
+                if (window.apiModule && typeof window.apiModule.updateSettings === 'function') {
+                    window.apiModule.updateSettings({
+                        apiKey: config.apiKey,
+                        isEnabled: config.isApiEnabled,
+                        model: config.apiModel,
+                        temperature: config.temperature,
+                        systemPromptTemplate: config.systemPrompt,
+                        apiBaseUrl: config.apiBaseUrl
+                    });
+                }
+                
+                // Отправляем запрос на сохранение в файл
+                fetch('save-config.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(config)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showStatus('Настройки успешно сохранены', 'success');
+                    } else {
+                        showStatus('Ошибка при сохранении настроек: ' + data.message, 'error');
+                        console.error('Ошибка при сохранении конфигурации:', data.message);
+                    }
+                })
+                .catch(error => {
+                    showStatus('Ошибка при отправке запроса на сервер. Настройки сохранены только локально.', 'warning');
+                    console.error('Ошибка при отправке запроса:', error);
+                });
+            }
+            
+            // Функция для отображения статусных сообщений
+            function showStatus(message, type) {
+                statusMessage.textContent = message;
+                statusMessage.className = 'status-message';
+                statusMessage.classList.add('status-' + type);
+                statusMessage.style.display = 'block';
+                
+                // Скрываем сообщение через 5 секунд
+                setTimeout(() => {
+                    statusMessage.style.display = 'none';
+                }, 5000);
+            }
+            
+            // Функция для тестирования API
+            function testApi() {
+                apiTestResult.style.display = 'none';
+                
+                if (!apiKey.value) {
+                    showStatus('Ключ API не задан', 'error');
+                    return;
+                }
+                
+                showStatus('Выполняем проверку API...', 'warning');
+                
+                // Если модуль API доступен, используем его для тестирования
+                if (window.apiModule && typeof window.apiModule.testApiRequest === 'function') {
+                    // Временно обновляем настройки API для теста
+                    window.apiModule.updateSettings({
+                        apiKey: apiKey.value,
+                        isEnabled: true,
+                        model: apiModel.value,
+                        temperature: parseFloat(apiTemperature.value),
+                        systemPromptTemplate: systemPrompt.value,
+                        apiBaseUrl: apiBaseUrl.value
+                    });
+                    
+                    // Тестовые данные
+                    const testData = {
+                        card: { title: "Тестовая карта" },
+                        question: "Что ждет меня в будущем?"
+                    };
+                    
+                    // Выполняем тестовый запрос
+                    window.apiModule.testApiRequest(testData)
+                        .then(result => {
+                            if (result.success) {
+                                showStatus('API работает корректно', 'success');
+                                apiTestResult.style.display = 'block';
+                                apiTestContent.innerHTML = `
+                                    <p><strong>Статус:</strong> Успешно</p>
+                                    <p><strong>Время выполнения:</strong> ${result.time} мс</p>
+                                    <p><strong>Результат:</strong></p>
+                                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-top: 10px;">
+                                        ${result.result.replace(/\n/g, '<br>')}
+                                    </div>
+                                `;
+                            } else {
+                                showStatus('Ошибка при проверке API', 'error');
+                                apiTestResult.style.display = 'block';
+                                apiTestContent.innerHTML = `
+                                    <p><strong>Статус:</strong> Ошибка</p>
+                                    <p><strong>Время выполнения:</strong> ${result.time} мс</p>
+                                    <p><strong>Ошибка:</strong> ${result.error}</p>
+                                `;
+                            }
+                        })
+                        .catch(error => {
+                            showStatus('Ошибка при проверке API', 'error');
+                            console.error('Ошибка при тестировании API:', error);
+                            apiTestResult.style.display = 'block';
+                            apiTestContent.innerHTML = `
+                                <p><strong>Статус:</strong> Ошибка</p>
+                                <p><strong>Ошибка:</strong> ${error.message}</p>
+                            `;
+                        });
+                } else {
+                    showStatus('Модуль API недоступен', 'error');
+                }
+            }
+            
+            // Обработчик отправки формы
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                saveConfig();
+            });
+            
+            // Обработчик кнопки проверки API
+            testApiBtn.addEventListener('click', function() {
+                testApi();
+            });
+            
+            // Загружаем конфигурацию при загрузке страницы
+            loadConfig();
+        });
+    </script>
+</body>
+</html> 

@@ -11,6 +11,7 @@ const ApiModule = (function() {
     let isEnabled = false;
     let model = 'gpt-3.5-turbo';
     let temperature = 0.7;
+    let apiBaseUrl = 'https://api.openai.com/v1';
     let systemPromptTemplate = 'Ты метафорическая карта предсказаний для дизайнеров. Создай творческое и вдохновляющее предсказание на основе названия карты "${cardTitle}" и вопроса пользователя "${question}". Предсказание должно быть полезным, позитивным и с долей юмора. Не более 3-4 предложений.';
 
     // Объект для хранения статистики использования API
@@ -36,6 +37,7 @@ const ApiModule = (function() {
     const GPT_MODEL_KEY = 'gptModel';
     const GPT_TEMP_KEY = 'gptTemperature'; 
     const GPT_PROMPT_KEY = 'gptPrompt';
+    const API_BASE_URL_KEY = 'apiBaseUrl';
     
     // Новые константы для QR-кодов
     const QR_MAPPING_KEY = 'qrCardMappings';
@@ -46,7 +48,49 @@ const ApiModule = (function() {
      */
     function init() {
         console.log('Инициализация API модуля...');
-        loadSettings();
+        
+        // Проверяем наличие глобальной конфигурации
+        if (window.APP_CONFIG) {
+            console.log('Обнаружена глобальная конфигурация APP_CONFIG:', window.APP_CONFIG);
+            
+            // Применяем настройки из глобальной конфигурации
+            if (window.APP_CONFIG.apiKey) {
+                apiKey = window.APP_CONFIG.apiKey;
+                console.log('API ключ установлен из глобальной конфигурации, длина:', apiKey.length);
+            }
+            
+            if (window.APP_CONFIG.isApiEnabled !== undefined) {
+                isEnabled = window.APP_CONFIG.isApiEnabled;
+                console.log('Статус API установлен из глобальной конфигурации:', isEnabled);
+            }
+            
+            if (window.APP_CONFIG.apiModel) {
+                model = window.APP_CONFIG.apiModel;
+                console.log('Модель API установлена из глобальной конфигурации:', model);
+            }
+            
+            if (window.APP_CONFIG.temperature !== undefined) {
+                temperature = window.APP_CONFIG.temperature;
+                console.log('Температура API установлена из глобальной конфигурации:', temperature);
+            }
+            
+            if (window.APP_CONFIG.systemPrompt) {
+                systemPromptTemplate = window.APP_CONFIG.systemPrompt;
+                console.log('Системный промпт установлен из глобальной конфигурации, длина:', systemPromptTemplate.length);
+            }
+            
+            if (window.APP_CONFIG.apiBaseUrl) {
+                apiBaseUrl = window.APP_CONFIG.apiBaseUrl;
+                console.log('Базовый URL API установлен из глобальной конфигурации:', apiBaseUrl);
+            }
+            
+            // Синхронизируем настройки с localStorage
+            syncSettingsToLocalStorage();
+        } else {
+            console.log('Глобальная конфигурация APP_CONFIG не найдена, загружаем настройки из localStorage');
+            loadSettings();
+        }
+        
         loadStats();
         loadQrConfig();
         console.log('API модуль инициализирован:', isEnabled ? 'Активен' : 'Отключен');
@@ -58,6 +102,34 @@ const ApiModule = (function() {
                 enabled: isEnabled,
                 timestamp: new Date().toISOString()
             });
+        }
+    }
+
+    /**
+     * Синхронизация настроек из переменных модуля в localStorage
+     */
+    function syncSettingsToLocalStorage() {
+        try {
+            // Сохраняем API ключ в оба формата
+            localStorage.setItem(GPT_API_KEY, apiKey);
+            localStorage.setItem(ADMIN_API_KEY, apiKey);
+            
+            // Сохраняем состояние enabled в оба формата
+            localStorage.setItem(GPT_ENABLED_KEY, isEnabled.toString());
+            localStorage.setItem(ADMIN_ENABLED_KEY, isEnabled.toString());
+            
+            // Сохраняем остальные настройки
+            localStorage.setItem(GPT_MODEL_KEY, model);
+            localStorage.setItem(GPT_TEMP_KEY, temperature.toString());
+            localStorage.setItem(API_BASE_URL_KEY, apiBaseUrl);
+            
+            // Сохраняем системный промпт в оба формата
+            localStorage.setItem(GPT_PROMPT_KEY, systemPromptTemplate);
+            localStorage.setItem(ADMIN_PROMPT_KEY, systemPromptTemplate);
+            
+            console.log('Настройки синхронизированы с localStorage');
+        } catch (error) {
+            console.error('Ошибка при синхронизации настроек с localStorage:', error);
         }
     }
 
@@ -89,6 +161,7 @@ const ApiModule = (function() {
             // Загружаем остальные настройки
             model = localStorage.getItem(GPT_MODEL_KEY) || 'gpt-3.5-turbo';
             temperature = parseFloat(localStorage.getItem(GPT_TEMP_KEY)) || 0.7;
+            apiBaseUrl = localStorage.getItem(API_BASE_URL_KEY) || 'https://api.openai.com/v1';
             
             // Загружаем системный промпт из всех возможных источников
             const savedPromptMain = localStorage.getItem(GPT_PROMPT_KEY);
@@ -118,7 +191,7 @@ const ApiModule = (function() {
             
             console.log('Загружены настройки API:', 
                 { enabled: isEnabled, model: model, hasKey: !!apiKey, keyLength: apiKey ? apiKey.length : 0,
-                  promptTemplate: systemPromptTemplate.substring(0, 50) + '...' });
+                  apiBaseUrl: apiBaseUrl, promptTemplate: systemPromptTemplate.substring(0, 50) + '...' });
         } catch (error) {
             console.error('Ошибка при загрузке настроек API:', error);
         }
@@ -401,8 +474,12 @@ const ApiModule = (function() {
         };
         
         try {
+            // Используем базовый URL из настроек
+            const apiEndpoint = `${apiBaseUrl}/chat/completions`;
+            console.log('Отправка запроса к API:', apiEndpoint);
+            
             // Отправляем запрос к API
-            const response = await fetch('https://api.openai.com/v1/chat/completions', requestOptions);
+            const response = await fetch(apiEndpoint, requestOptions);
             
             // Если ответ не OK, выбрасываем ошибку
             if (!response.ok) {
@@ -596,13 +673,24 @@ const ApiModule = (function() {
             console.log('Системный промпт обновлен:', systemPromptTemplate.substring(0, 50) + '...');
         }
         
+        if (settings.hasOwnProperty('apiBaseUrl')) {
+            apiBaseUrl = settings.apiBaseUrl;
+            localStorage.setItem(API_BASE_URL_KEY, apiBaseUrl);
+            updated = true;
+            console.log('Базовый URL API обновлен:', apiBaseUrl);
+        }
+        
         if (updated) {
             console.log('Настройки API обновлены:', { 
                 enabled: isEnabled, 
                 model: model, 
                 hasKey: !!apiKey,
-                keyLength: apiKey ? apiKey.length : 0
+                keyLength: apiKey ? apiKey.length : 0,
+                apiBaseUrl: apiBaseUrl
             });
+            
+            // Обновляем глобальную конфигурацию
+            updateGlobalConfig();
             
             // Публикуем событие обновления настроек
             if (window.EventBus && typeof window.EventBus.publish === 'function') {
@@ -610,6 +698,7 @@ const ApiModule = (function() {
                     enabled: isEnabled,
                     model: model,
                     hasKey: !!apiKey,
+                    apiBaseUrl: apiBaseUrl,
                     timestamp: new Date().toISOString()
                 });
             }
@@ -618,6 +707,94 @@ const ApiModule = (function() {
         }
         
         return updated;
+    }
+
+    /**
+     * Обновление глобальной конфигурации на основе текущих настроек
+     */
+    function updateGlobalConfig() {
+        if (window.APP_CONFIG) {
+            window.APP_CONFIG.apiKey = apiKey;
+            window.APP_CONFIG.isApiEnabled = isEnabled;
+            window.APP_CONFIG.apiModel = model;
+            window.APP_CONFIG.temperature = temperature;
+            window.APP_CONFIG.systemPrompt = systemPromptTemplate;
+            window.APP_CONFIG.apiBaseUrl = apiBaseUrl;
+            window.APP_CONFIG.lastUpdated = new Date().toISOString();
+            
+            console.log('Глобальная конфигурация обновлена');
+            
+            // Синхронизируем config.json через fetch с методом POST
+            saveConfigToFile();
+        } else {
+            console.warn('Глобальная конфигурация APP_CONFIG не найдена, создаем новую');
+            window.APP_CONFIG = {
+                apiKey: apiKey,
+                isApiEnabled: isEnabled,
+                apiModel: model,
+                temperature: temperature,
+                systemPrompt: systemPromptTemplate,
+                apiBaseUrl: apiBaseUrl,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            // Синхронизируем config.json через fetch с методом POST
+            saveConfigToFile();
+        }
+    }
+    
+    /**
+     * Сохранение настроек в файл config.json через специальный серверный скрипт
+     */
+    function saveConfigToFile() {
+        try {
+            const configData = {
+                apiBaseUrl: apiBaseUrl,
+                apiKey: apiKey,
+                apiModel: model,
+                isApiEnabled: isEnabled,
+                temperature: temperature,
+                systemPrompt: systemPromptTemplate,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            console.log('Сохранение конфигурации в файл config.json...');
+            
+            // Сохраняем локальную копию конфигурации
+            const configString = JSON.stringify(configData, null, 2);
+            localStorage.setItem('configBackup', configString);
+            
+            // Отправляем конфигурацию на сервер
+            fetch('save-config.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: configString
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Конфигурация успешно сохранена в файл:', data.message);
+                    
+                    // Публикуем событие сохранения конфигурации
+                    if (window.EventBus && typeof window.EventBus.publish === 'function') {
+                        window.EventBus.publish('CONFIG_SAVED', {
+                            success: true,
+                            timestamp: data.timestamp
+                        });
+                    }
+                } else {
+                    console.error('Ошибка при сохранении конфигурации в файл:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка при отправке конфигурации на сервер:', error);
+                console.log('Конфигурация сохранена только в localStorage');
+            });
+        } catch (error) {
+            console.error('Ошибка при подготовке конфигурации для сохранения:', error);
+        }
     }
 
     /**
@@ -630,6 +807,7 @@ const ApiModule = (function() {
             model: model,
             temperature: temperature,
             systemPromptTemplate: systemPromptTemplate,
+            apiBaseUrl: apiBaseUrl,
             hasApiKey: !!apiKey
         };
     }
